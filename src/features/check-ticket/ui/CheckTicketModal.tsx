@@ -8,7 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useCheckTicket } from '../api';
 import { Button } from '@/shared/ui/Button';
 import { Input } from '@/shared/ui/Input';
-import { useMounted } from '@/hook/useMounted';
+import { useMounted } from '@/hooks/useMounted';
 
 interface CheckTicketModalProps {
   isOpen: boolean;
