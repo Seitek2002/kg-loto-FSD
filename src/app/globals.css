@@ -1,26 +1,50 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  --font-benzin: var(--font-benzin), ui-sans-serif, system-ui, sans-serif;
+  --font-rubik: var(--font-rubik), ui-sans-serif, system-ui, sans-serif;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+@layer base {
+  /* Критически важно для нативного ощущения */
+  html,
+  body {
+    background-color: #f5f5f5;
+    /* Запрещаем выделение текста везде */
+    user-select: none;
+    -webkit-user-select: none;
+    /* Отключаем синюю подсветку при тапе на Android */
+    -webkit-tap-highlight-color: transparent;
+    /* Отключаем всплывающее меню (лупу/копирование) при долгом тапе на iOS */
+    -webkit-touch-callout: none;
+    /* Отключаем резиновый скролл за пределы страницы */
+    overscroll-behavior-y: none;
+  }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  /* Разрешаем выделение только внутри инпутов (если они будут) */
+  input,
+  textarea {
+    user-select: text;
+    -webkit-user-select: text;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer utilities {
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+@layer components {
+  .glass {
+    backdrop-filter: url(#liquid-glass);
+    background: rgba(255, 255, 255, 0.2); 
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 10px 40px -10px rgba(0,0,0,0.1);
+    overflow: hidden; 
+  }
 }
