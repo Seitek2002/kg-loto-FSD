@@ -11,7 +11,7 @@ interface TicketCardProps {
   onToggle: () => void;
 }
 
-export const TicketCard = ({
+export const DrawTicketCard  = ({
   ticketNumber,
   price,
   selectedNumbers,

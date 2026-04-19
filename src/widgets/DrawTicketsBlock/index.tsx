@@ -2,10 +2,11 @@
 
 // Твои хуки
 import { useCartStore } from "@/entities/cart/model";
+
+import { DrawTicketCard } from "@/shared/ui/DrawTicketCard";
 // import { useCurrentDraws, useDrawTickets } from "@/entities/lottery/api";
 
 import { Skeleton } from "@/shared/ui/Skeleton";
-import { TicketCard } from "@/shared/ui/TicketCard";
 
 export const DrawTicketsBlock = ({ lotteryId }: { lotteryId: string }) => {
   const { toggleItem, items } = useCartStore();
@@ -55,7 +56,7 @@ export const DrawTicketsBlock = ({ lotteryId }: { lotteryId: string }) => {
           const ticketIdStr = String(ticket.ticketId);
 
           return (
-            <TicketCard
+            <DrawTicketCard
               key={ticketIdStr}
               ticketNumber={ticket.ticketNumber}
               price={ticket.price}
