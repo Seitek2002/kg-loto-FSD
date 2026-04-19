@@ -1,17 +1,12 @@
 import { Metadata } from "next";
 
-import { PrizesClient } from "./PrizesClient";
+import { WinnersListContent } from "./WinnersListContent";
 
 export const metadata: Metadata = {
-  title: "KGLOTO | Мои призы",
+  title: "KGLOTO | Победители",
+  description: "История победителей лотереи",
 };
 
-export default function PrizesPage() {
-  return (
-    <div className="min-h-screen bg-[#F5F5F5] font-rubik pt-6 pb-24">
-      <div className="max-w-[1000px] mx-auto">
-        <PrizesClient />
-      </div>
-    </div>
-  );
+export default function WinnersPage() {
+  return <WinnersListContent />;
 }
