@@ -15,7 +15,6 @@ const PROFILE_MENU = [
   { label: "Проверить билет", href: "/#check" },
   { label: "Тиражные билеты", href: "/draw-tickets" },
   { label: "Язык", href: "/language" },
-  { label: "Подарить билет", href: "/gift" },
   { label: "Победители", href: "/winners" },
   { label: "О компании", href: "/about" },
   { label: "Контакты", href: "/contacts" },
@@ -95,7 +94,7 @@ export const ProfileClient = () => {
 
       <div className="flex flex-col items-center mb-8 px-4">
         <div
-          className="relative w-[120px] h-[120px] mb-4 cursor-pointer active:scale-95 transition-transform"
+          className="relative w-30 h-30 mb-4 cursor-pointer active:scale-95 transition-transform"
           onClick={handleAvatarClick}
         >
           <div className="w-full h-full rounded-full overflow-hidden border-2 border-gray-200 bg-gray-200 relative">
@@ -121,7 +120,7 @@ export const ProfileClient = () => {
         </p>
       </div>
 
-      <div className="w-full bg-white rounded-t-[32px] sm:rounded-[40px] px-6 sm:px-8 py-6 shadow-sm min-h-[50vh]">
+      <div className="w-full bg-white rounded-t-4xl sm:rounded-[40px] px-6 sm:px-8 py-6 shadow-sm min-h-[50vh]">
         <div className="flex flex-col">
           {PROFILE_MENU.map((item, index) => (
             <Link
@@ -140,7 +139,7 @@ export const ProfileClient = () => {
 
       <AnimatePresence>
         {isAvatarModalOpen && (
-          <div className="fixed inset-0 z-[100] flex flex-col justify-end">
+          <div className="fixed inset-0 z-100 flex flex-col justify-end">
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -162,7 +161,7 @@ export const ProfileClient = () => {
                   setIsAvatarModalOpen(false);
                 }
               }}
-              className="relative w-full bg-white rounded-t-[32px] px-6 pb-12 pt-4 shadow-2xl z-10 touch-none"
+              className="relative w-full bg-white rounded-t-4xl px-6 pb-12 pt-4 shadow-2xl z-10 touch-none"
             >
               <div className="w-12 h-1.5 bg-gray-300 rounded-full mx-auto mb-8 cursor-grab active:cursor-grabbing" />
 
