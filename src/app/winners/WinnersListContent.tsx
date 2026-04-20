@@ -10,7 +10,6 @@ import { ChevronLeft } from "lucide-react";
 import { useWinners } from "@/entities/winner/api";
 import { WinnerCard } from "@/entities/winner/ui/WinnerCard";
 
-// Хук из слоя entities
 import { cn } from "@/shared/lib/utils";
 import { Button } from "@/shared/ui/Button";
 import { Description } from "@/shared/ui/Description";
@@ -18,32 +17,44 @@ import { Title } from "@/shared/ui/Title";
 
 const ITEMS_PER_PAGE = 12;
 
+// 🔥 1. Обновляем интерфейс: добавляем все поля, которые ждет WinnerCard
+export interface WinnerItem {
+  id: number;
+  lotteryBadge: string;
+  name: string;
+  city: string;
+  prize: string;
+  image: string;
+  [key: string]: any;
+}
+
 export const WinnersListContent = () => {
   const mounted = useMounted();
-  const { data: allWinners, isLoading } = useWinners();
+  const { data: rawData, isLoading } = useWinners();
 
   const [selectedFilters, setSelectedFilters] = useState<string[]>([]);
   const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
 
-  // 🔥 ДИНАМИЧЕСКИЕ ФИЛЬТРЫ
+  // 🔥 2. Оборачиваем в useMemo, чтобы ссылка на пустой массив не менялась при каждом рендере
+  const allWinners = useMemo<WinnerItem[]>(() => {
+    return (rawData as WinnerItem[]) || [];
+  }, [rawData]);
+
+  // ДИНАМИЧЕСКИЕ ФИЛЬТРЫ
   const dynamicFilters = useMemo(() => {
-    if (!allWinners) return [];
+    if (allWinners.length === 0) return [];
 
-    // Вытаскиваем все значения lotteryBadge
     const allBadges = allWinners.map((w) => w.lotteryBadge);
-
-    // Оставляем только уникальные значения
     const uniqueBadges = Array.from(new Set(allBadges));
 
-    // Формируем массив для кнопок
     return uniqueBadges.map((badge) => ({
       label: badge,
-      value: badge?.toLowerCase(),
+      value: badge.toLowerCase(),
     }));
   }, [allWinners]);
 
   const filteredWinners = useMemo(() => {
-    if (!allWinners) return [];
+    if (allWinners.length === 0) return [];
     if (selectedFilters.length === 0) return allWinners;
 
     return allWinners.filter((w) =>

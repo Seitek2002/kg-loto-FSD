@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronDown, Loader2 } from "lucide-react";
@@ -8,6 +8,7 @@ import { ChevronDown, Loader2 } from "lucide-react";
 import { DrawDetailsModal } from "@/features/draw-details/ui/DrawDetailsModal";
 
 import { useCurrentDraws } from "@/entities/draw/api";
+import type { CurrentDraw } from "@/entities/draw/api";
 
 import { NumberedBall } from "@/shared/ui/NumberedBall";
 
@@ -16,21 +17,28 @@ interface DrawArchiveBlockProps {
 }
 
 export const DrawArchiveBlock = ({ lotteryId }: DrawArchiveBlockProps) => {
-  const [openMonths, setOpenMonths] = useState<string[]>([]);
+  // Мы больше не храним здесь первый месяц насильно.
+  // Храним только те месяцы, на которые юзер явно кликнул.
+  const [interactedMonths, setInteractedMonths] = useState<string[]>([]);
+
+  // Флаг, чтобы понимать, трогал ли юзер аккордеон.
+  // Если нет — мы будем принудительно держать первый месяц открытым.
+  const [hasInteracted, setHasInteracted] = useState(false);
+
   const [selectedDrawId, setSelectedDrawId] = useState<string | null>(null);
 
-  const { data: draws, isLoading, isError } = useCurrentDraws(lotteryId);
+  const { data: rawDraws, isLoading, isError } = useCurrentDraws(lotteryId);
 
-  // Умная группировка по месяцам
+  // Умная группировка по месяцам.
+  // 🔥 Решили проблему #1: || [] теперь внутри useMemo, а в зависимости передаем rawDraws.
   const archiveData = useMemo(() => {
-    if (!draws) return [];
+    const draws = (rawDraws as CurrentDraw[]) || [];
+    if (draws.length === 0) return [];
 
-    // Оставляем только завершенные тиражи
     const completed = draws.filter(
       (d) => d.status === "completed" || d.status === "closed",
     );
 
-    // Сортируем от новых к старым
     completed.sort(
       (a, b) => new Date(b.drawDate).getTime() - new Date(a.drawDate).getTime(),
     );
@@ -43,7 +51,6 @@ export const DrawArchiveBlock = ({ lotteryId }: DrawArchiveBlockProps) => {
         month: "long",
         year: "numeric",
       });
-      // Делаем первую букву заглавной
       const formattedMonth =
         monthStr.charAt(0).toUpperCase() + monthStr.slice(1);
 
@@ -57,21 +64,34 @@ export const DrawArchiveBlock = ({ lotteryId }: DrawArchiveBlockProps) => {
       month,
       items,
     }));
-  }, [draws]);
+  }, [rawDraws]); // Зависим от сырых данных
 
-  // Открываем первый месяц автоматически
-  useEffect(() => {
-    if (archiveData.length > 0 && openMonths.length === 0) {
-      setOpenMonths([archiveData[0].month]);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [archiveData]);
+  // 🔥 Решили проблему #2: Убрали useEffect полностью!
 
+  // Функция переключения вкладок
   const toggleMonth = (month: string) => {
-    setOpenMonths((prev) =>
+    // Как только юзер кликнул, мы запоминаем, что он начал взаимодействие
+    if (!hasInteracted) setHasInteracted(true);
+
+    setInteractedMonths((prev) =>
       prev.includes(month) ? prev.filter((m) => m !== month) : [...prev, month],
     );
   };
+
+  // Вычисляем, какие месяцы открыты прямо сейчас (в момент рендера)
+  const getOpenMonths = () => {
+    if (archiveData.length === 0) return [];
+
+    // Если юзер еще ничего не нажимал, возвращаем первый месяц из загруженных данных
+    if (!hasInteracted) {
+      return [archiveData[0].month];
+    }
+
+    // Если нажимал — возвращаем то, что лежит в стейте
+    return interactedMonths;
+  };
+
+  const openMonths = getOpenMonths();
 
   if (isLoading) {
     return (
@@ -90,7 +110,7 @@ export const DrawArchiveBlock = ({ lotteryId }: DrawArchiveBlockProps) => {
   }
 
   return (
-    <div className="mt-8 lg:mt-12 bg-transparent lg:bg-white lg:rounded-[32px] lg:p-10 lg:shadow-sm lg:border lg:border-gray-100">
+    <div className="mt-8 lg:mt-12 bg-transparent lg:bg-white lg:rounded-[32px] lg:p-10 lg:shadow-sm lg:border lg:border-gray-100 text-left">
       {/* ШАПКА ТАБЛИЦЫ (Только ПК) */}
       <div className="hidden lg:grid grid-cols-5 gap-4 items-center bg-[#F58220] rounded-full px-8 py-4 mb-6">
         <div className="text-white font-bold text-[15px]">Тираж</div>
@@ -107,6 +127,7 @@ export const DrawArchiveBlock = ({ lotteryId }: DrawArchiveBlockProps) => {
       {/* СПИСОК МЕСЯЦЕВ (Аккордеон) */}
       <div className="flex flex-col gap-2 lg:gap-4">
         {archiveData.map((group) => {
+          // Проверяем, открыт ли текущий месяц
           const isOpen = openMonths.includes(group.month);
 
           return (
@@ -179,7 +200,7 @@ export const DrawArchiveBlock = ({ lotteryId }: DrawArchiveBlockProps) => {
                             {/* --- МОБИЛЬНАЯ КАРТОЧКА --- */}
                             <div
                               onClick={() => setSelectedDrawId(item.drawId)}
-                              className="flex lg:hidden flex-col gap-3 bg-white p-5 rounded-[20px] shadow-sm border border-gray-100 active:scale-[0.98] transition-transform"
+                              className="flex lg:hidden flex-col gap-3 bg-white p-5 rounded-[20px] shadow-sm border border-gray-100 active:scale-[0.98] transition-transform cursor-pointer"
                             >
                               <div className="flex justify-between items-center">
                                 <span className="text-[#737373] text-[14px] font-medium">

@@ -6,8 +6,8 @@ import { CartDrawer } from "@/widgets/CartDrawer";
 import { DrawTicketsBlock } from "@/widgets/DrawTicketsBlock";
 import { PopularTicketsWidget } from "@/widgets/PopularTickets";
 import { TicketsHeroWidget } from "@/widgets/TicketsHero";
-// import { DrawRulesBlock } from '@/widgets/DrawRulesBlock'; // Пока закомментируем, если их еще нет
-// import { DrawArchiveBlock } from '@/widgets/DrawArchiveBlock';
+import { DrawRulesBlock } from '@/widgets/DrawRulesBlock';
+import { DrawArchiveBlock } from '@/widgets/DrawArchiveBlock';
 import { WinnersHistoryWidget } from "@/widgets/WinnersHistory";
 
 interface LotteryClientProps {
@@ -32,8 +32,7 @@ export const LotteryClient = ({ lotteryId }: LotteryClientProps) => {
 
       {activeTab === "rules" && (
         <div className="mt-12 lg:mt-16 text-center text-gray-500 py-10">
-          {/* <DrawRulesBlock /> */}
-          Здесь будут правила игры (Блок в разработке)
+          <DrawRulesBlock />
           <div className="mt-16 lg:mt-24 text-left">
             <WinnersHistoryWidget />
           </div>
@@ -47,8 +46,7 @@ export const LotteryClient = ({ lotteryId }: LotteryClientProps) => {
 
       {activeTab === "archive" && (
         <div className="mt-12 lg:mt-16 text-center text-gray-500 py-10">
-          {/* <DrawArchiveBlock lotteryId={lotteryId} /> */}
-          Здесь будет архив тиражей (Блок в разработке)
+          <DrawArchiveBlock lotteryId={lotteryId} />
         </div>
       )}
 
