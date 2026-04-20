@@ -112,8 +112,8 @@ export const TicketsHeroWidget = ({
               <span className="hidden lg:inline">До розыгрыша</span>
             </span>
 
-            <div className="flex items-stretch gap-2 lg:gap-4 w-full">
-              <div className="flex flex-col flex-[1] bg-white/10 backdrop-blur-md border border-white/40 rounded-[12px] lg:rounded-[16px] p-2 lg:p-3">
+            <div className="flex items-stretch justify-center gap-2 lg:gap-4 w-full">
+              <div className="flex flex-col bg-white/10 backdrop-blur-md border border-white/40 rounded-[12px] lg:rounded-[16px] p-2 lg:p-3">
                 <span className="text-white text-[11px] lg:text-[14px] font-medium mb-1">
                   Дней
                 </span>
@@ -121,7 +121,7 @@ export const TicketsHeroWidget = ({
                   24
                 </span>
               </div>
-              <div className="flex flex-col flex-[1.8] lg:flex-[2] bg-white/10 backdrop-blur-md border border-white/40 rounded-[12px] lg:rounded-[16px] p-2 lg:p-3">
+              <div className="flex flex-col bg-white/10 backdrop-blur-md border border-white/40 rounded-[12px] lg:rounded-[16px] p-2 lg:p-3">
                 <span className="text-white text-[11px] lg:text-[14px] font-medium mb-1">
                   Часов
                 </span>
