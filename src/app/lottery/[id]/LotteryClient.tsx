@@ -37,8 +37,8 @@ export const LotteryClient = ({ lotteryId }: LotteryClientProps) => {
           <div className="mt-16 lg:mt-24 text-left">
             <WinnersHistoryWidget />
           </div>
-          {/* <LotteryConditions terms={MOCK_TERMS} /> */}
-          <PopularTicketsWidget
+          {/* <LotteryConditions terms={MOCK_TERMS} />  */}
+          <PopularTicketsWidget ///tickets {drawId} {lotteryId}
             title="Другие лотереи"
             currentLotteryId={lotteryId}
           />

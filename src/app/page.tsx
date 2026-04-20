@@ -12,11 +12,11 @@ export const metadata = {
 export default function Home() {
   return (
     <>
-      <HeroWidget />
+      <HeroWidget /> {/* slider */}
 
       <div className="mt-10 max-w-300 mx-auto px-4">
         {/* <PopularTicketsWidget /> */}
-        <DrawLotteriesWidget />
+        <DrawLotteriesWidget /> {/* /lotteries/current */}
         <CheckLotteryWidget />
 
         <FAQWidget />
