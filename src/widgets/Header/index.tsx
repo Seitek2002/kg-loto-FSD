@@ -6,13 +6,22 @@ import { useRouter } from "next/navigation";
 
 import { ChevronLeft, Wallet } from "lucide-react";
 
+// 🔥 Подключаем наш API хук и стор
+import { useBalance } from "@/entities/finance/api";
+
 import { cn } from "@/shared/lib/utils";
+import { useAuthStore } from "@/shared/model/auth";
 
 export const HeaderWidget = ({ className }: { className?: string }) => {
   const router = useRouter();
 
-  // TODO: Позже будем брать баланс из Zustand или React Query
-  const balance = 150;
+  // 🔥 Вызываем хук. Он будет держать баланс в актуальном состоянии,
+  // пока юзер находится в приложении.
+  useBalance();
+
+  // 🔥 Достаем баланс из нашего стора (useBalance сам его туда записывает)
+  const user = useAuthStore((state) => state.user);
+  const balance = user?.balance || "0";
 
   return (
     <header
@@ -30,10 +39,10 @@ export const HeaderWidget = ({ className }: { className?: string }) => {
         <ChevronLeft size={28} strokeWidth={2.5} />
       </button>
 
-      {/* Логотип по центру (абсолютно позиционирован, чтобы не смещаться из-за ширины боковых элементов) */}
+      {/* Логотип по центру */}
       <div className="absolute left-1/2 -translate-x-1/2">
         <Image
-          src="/logo.png" // Твой файл из public
+          src="/logo.png"
           alt="KGLOTO.COM"
           width={110}
           height={32}

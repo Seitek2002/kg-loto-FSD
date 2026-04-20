@@ -75,7 +75,7 @@ export const DrawTicketsBlock = ({ lotteryId }: { lotteryId: string }) => {
           // Ищем, есть ли билет в корзине
           const isInBasket = basketIds.includes(ticket.ticketId);
 
-          console.log(ticket);
+          // console.log(ticket);
 
           return (
             <DrawTicketCard
