@@ -5,7 +5,8 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 
-import { Star, Ticket, Trophy, User } from "lucide-react";
+// 🔥 Убрали Trophy, добавили ShoppingCart
+import { ShoppingCart, Star, Ticket, User } from "lucide-react";
 
 import { cn } from "@/shared/lib/utils";
 
@@ -14,7 +15,8 @@ import { cn } from "@/shared/lib/utils";
 const navItems = [
   { label: "Лотереи", href: "/", icon: Star, protected: false },
   { label: "Билеты", href: "/tickets", icon: Ticket, protected: true },
-  { label: "Призы", href: "/winners", icon: Trophy, protected: false }, // Добавили "Призы"
+  // 🔥 Заменили Призы на Корзину
+  { label: "Корзина", href: "/cart", icon: ShoppingCart, protected: false },
   { label: "Профиль", href: "/profile", icon: User, protected: true },
 ];
 
@@ -47,12 +49,10 @@ export function BottomNav() {
   };
 
   return (
-    // Убрали flex и justify-between, так как теперь у нас только один центральный блок
     <div className="fixed bottom-6 left-4 right-4 z-50 flex lg:hidden justify-center items-center pointer-events-none">
       <nav
         className={cn(
           "w-full max-w-100 pointer-events-auto border border-gray-100/50 rounded-[40px] shadow-2xl shadow-gray-200/50 p-2 flex justify-between items-center",
-          // Оставляем логику стекла
           isIOS ? "backdrop-blur-xl bg-white/70" : "glass bg-white/80",
         )}
       >
@@ -69,7 +69,6 @@ export function BottomNav() {
               onClick={(e) => handleProtectedClick(e, item.protected)}
               className={cn(
                 "flex flex-col items-center flex-1 py-2 rounded-[30px] transition-all duration-200 active:scale-95",
-                // Цвета строго по макету из фигмы
                 isActive
                   ? "text-[#2F73F6] bg-[#EBEBEB]"
                   : "text-[#5B5B5B] bg-transparent hover:bg-gray-50",
@@ -77,7 +76,6 @@ export function BottomNav() {
             >
               <item.icon
                 size={22}
-                // Если кнопка активна - заливаем иконку синим (согласно макету), если нет - убираем заливку
                 fill={isActive ? "currentColor" : "none"}
                 strokeWidth={isActive ? 2 : 2.5}
                 className="shrink-0 mb-1"

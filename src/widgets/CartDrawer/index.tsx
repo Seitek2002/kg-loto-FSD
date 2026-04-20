@@ -22,7 +22,7 @@ export const CartDrawer = () => {
       className={cn(
         "fixed left-0 right-0 bg-[#F9F9F9] rounded-t-3xl z-100 shadow-[0_-15px_40px_-10px_rgba(245,130,32,0.2)] transition-all duration-300 flex flex-col overflow-hidden",
         // В WebView мы приподнимаем корзину над BottomNav (которая высотой около 80px)
-        isExpanded ? "bottom-0" : "bottom-0",
+        isExpanded ? "bottom-20" : "bottom-20",
       )}
     >
       <div
