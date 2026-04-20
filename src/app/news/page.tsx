@@ -21,8 +21,6 @@ async function getAllNews(): Promise<NewsItem[]> {
       headers: { "Accept-Language": locale },
     });
 
-    console.log(data);
-
     return data?.data?.results || [];
   } catch (error) {
     console.error("Error fetching news:", error);
