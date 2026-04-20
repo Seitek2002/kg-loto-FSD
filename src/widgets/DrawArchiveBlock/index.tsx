@@ -95,7 +95,7 @@ export const DrawArchiveBlock = ({ lotteryId }: DrawArchiveBlockProps) => {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center p-10 mt-8 lg:mt-12 bg-transparent lg:bg-white lg:rounded-[32px] lg:shadow-sm lg:border lg:border-gray-100">
+      <div className="flex justify-center p-10 mt-8 lg:mt-12 bg-transparent lg:bg-white lg:rounded-4xl lg:shadow-sm lg:border lg:border-gray-100">
         <Loader2 className="animate-spin text-[#FF7600] w-10 h-10" />
       </div>
     );
@@ -103,14 +103,14 @@ export const DrawArchiveBlock = ({ lotteryId }: DrawArchiveBlockProps) => {
 
   if (isError || archiveData.length === 0) {
     return (
-      <div className="mt-8 lg:mt-12 bg-transparent lg:bg-white lg:rounded-[32px] lg:p-10 lg:shadow-sm lg:border lg:border-gray-100 text-center font-medium text-gray-500">
+      <div className="mt-8 lg:mt-12 bg-transparent lg:bg-white lg:rounded-4xl lg:p-10 lg:shadow-sm lg:border lg:border-gray-100 text-center font-medium text-gray-500">
         Архив тиражей пока пуст.
       </div>
     );
   }
 
   return (
-    <div className="mt-8 lg:mt-12 bg-transparent lg:bg-white lg:rounded-[32px] lg:p-10 lg:shadow-sm lg:border lg:border-gray-100 text-left">
+    <div className="mt-8 lg:mt-12 bg-transparent lg:bg-white lg:rounded-4xl lg:p-10 lg:shadow-sm lg:border lg:border-gray-100 text-left">
       {/* ШАПКА ТАБЛИЦЫ (Только ПК) */}
       <div className="hidden lg:grid grid-cols-5 gap-4 items-center bg-[#F58220] rounded-full px-8 py-4 mb-6">
         <div className="text-white font-bold text-[15px]">Тираж</div>
