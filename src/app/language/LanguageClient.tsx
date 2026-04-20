@@ -9,10 +9,12 @@ import { useMounted } from "@/hooks/useMounted";
 import { Check, ChevronLeft } from "lucide-react";
 
 import { cn } from "@/shared/lib/utils";
+// 🔥 1. Подключаем наш стор локализации
+import { useLocaleStore } from "@/shared/model/localeStore";
 
 const LANGUAGES = [
   { id: "ru", name: "Русский", icon: "/flags/ru.svg" },
-  { id: "kg", name: "Кыргызча", icon: "/flags/kg.svg" },
+  { id: "ky", name: "Кыргызча", icon: "/flags/kg.svg" }, // В JSON бэкенда кыргызский обозначен как "ky"
   { id: "en", name: "English", icon: "/flags/en.svg" },
 ];
 
@@ -24,9 +26,9 @@ const setLocaleCookie = (locale: string) => {
 export const LanguageClient = () => {
   const mounted = useMounted();
 
-  // 🔥 Ленивая инициализация стейта.
-  // Функция внутри useState вызовется только 1 раз при монтировании.
-  // Никаких useEffect и лишних рендеров!
+  // 🔥 2. Достаем функцию смены языка из Zustand
+  const setGlobalLocale = useLocaleStore((state) => state.setLocale);
+
   const [activeLang, setActiveLang] = useState(() => {
     if (typeof window !== "undefined") {
       return localStorage.getItem("NEXT_LOCALE") || "ru";
@@ -35,11 +37,15 @@ export const LanguageClient = () => {
   });
 
   const handleLanguageChange = (newLocale: string) => {
+    // 1. Меняем локальный стейт (для галочки в UI)
     setActiveLang(newLocale);
+    // 2. Сохраняем в память (для API и будущих заходов)
     setLocaleCookie(newLocale);
+    // 3. 🔥 Меняем глобальный стейт!
+    // Это заставит LocaleProvider скачать новый словарь и перевести всё приложение на лету.
+    setGlobalLocale(newLocale);
   };
 
-  // Защита от Hydration Mismatch
   if (!mounted) return null;
 
   return (

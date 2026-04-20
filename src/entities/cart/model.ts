@@ -8,7 +8,7 @@ export interface CartItem {
   combination: number[];
   lotteryId: string;
   drawId: string;
-  name: string;
+  name: string; // Название лотереи
 }
 
 interface CartStore {
@@ -19,6 +19,7 @@ interface CartStore {
 
 export const useCartStore = create<CartStore>((set) => ({
   items: [],
+
   toggleItem: (item) =>
     set((state) => {
       const exists = state.items.find((i) => i.id === item.id);
@@ -27,5 +28,6 @@ export const useCartStore = create<CartStore>((set) => ({
       }
       return { items: [...state.items, item] };
     }),
+
   clearCart: () => set({ items: [] }),
 }));

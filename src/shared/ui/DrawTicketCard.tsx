@@ -6,16 +6,14 @@ interface TicketCardProps {
   ticketNumber: number | string;
   price: number;
   selectedNumbers: number[];
-  isOrangeButton: boolean;
   isInBasket: boolean;
   onToggle: () => void;
 }
 
-export const DrawTicketCard  = ({
+export const DrawTicketCard = ({
   ticketNumber,
   price,
   selectedNumbers,
-  isOrangeButton,
   isInBasket,
   onToggle,
 }: TicketCardProps) => {
@@ -29,14 +27,14 @@ export const DrawTicketCard  = ({
       )}
     >
       {/* Боковые вырезы */}
-      <div className="absolute -left-2 top-1/2 -translate-y-1/2 w-4 h-4 bg-[#F5F5F5] rounded-full border-r border-gray-100" />
-      <div className="absolute -right-2 top-1/2 -translate-y-1/2 w-4 h-4 bg-[#F5F5F5] rounded-full border-l border-gray-100" />
+      <div className="absolute -left-2 top-7.5 w-4 h-4 bg-[#F5F5F5] rounded-full border-r border-gray-100" />
+      <div className="absolute -right-2 top-7.5 w-4 h-4 bg-[#F5F5F5] rounded-full border-l border-gray-100" />
 
       <div className="flex justify-between items-center border-b border-dashed border-gray-300 pb-4 mb-4">
-        <span className="text-gray-400 font-medium text-sm">
+        <span className="text-[#737373] font-medium text-sm">
           Билет №{ticketNumber}
         </span>
-        <span className="font-bold text-[#4B4B4B] text-[15px]">
+        <span className="font-bold text-[#4B4B4B] text-[16px]">
           {price} <span className="underline">с</span>
         </span>
       </div>
@@ -48,8 +46,8 @@ export const DrawTicketCard  = ({
             className={cn(
               "flex items-center justify-center aspect-square rounded-md text-[13px] font-bold transition-colors cursor-pointer",
               selectedNumbers?.includes(num)
-                ? "bg-[#F58220] text-white shadow-sm"
-                : "bg-[#F5F5F5] text-[#4B4B4B] hover:bg-gray-200",
+                ? "bg-[#FF7600] text-white shadow-sm"
+                : "bg-[#F9F9F9] text-[#4B4B4B] hover:bg-gray-200",
             )}
           >
             {num}
@@ -60,15 +58,13 @@ export const DrawTicketCard  = ({
       <Button
         onClick={onToggle}
         className={cn(
-          "w-full py-3.5 shadow-sm",
+          "w-full py-3.5 rounded-2xl text-[13px] shadow-sm",
           isInBasket
-            ? "bg-[#4B4B4B] text-white"
-            : isOrangeButton
-              ? "bg-[#F58220] text-white"
-              : "bg-[#FFD600] text-[#4B4B4B]",
+            ? "bg-[#4B4B4B] text-white hover:bg-gray-800"
+            : "bg-[#FF7600] text-white hover:bg-[#E56A00]", // 🔥 Единый дефолтный цвет кнопок
         )}
       >
-        {isInBasket ? "Убрать" : `Играть • ${price} с`}
+        {isInBasket ? "Убрать из корзины" : `Добавить • ${price} с`}
       </Button>
     </div>
   );

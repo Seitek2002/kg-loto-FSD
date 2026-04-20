@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Rubik } from "next/font/google";
 import localFont from "next/font/local";
 
@@ -7,6 +7,7 @@ import { HeaderWidget } from "@/widgets/Header";
 
 import { LiquidFilterDef } from "@/shared/ui/LiquidFilterDef";
 
+import { LocaleProvider } from "./LocaleProvider";
 import "./globals.css";
 import QueryProvider from "./providers/QueryProvider";
 
@@ -34,8 +35,13 @@ export const metadata: Metadata = {
   title: "KGLOTO",
   description: "Лотерея KGLOTO",
   icons: { icon: "/favicon.png" },
-  viewport:
-    "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
 };
 
 export default function RootLayout({
@@ -49,17 +55,19 @@ export default function RootLayout({
         className={`${rubik.variable} ${benzin.variable} antialiased font-rubik bg-[#F5F5F5]`}
       >
         <QueryProvider>
-          <LiquidFilterDef />
+          <LocaleProvider>
+            <LiquidFilterDef />
 
-          <div className="relative flex flex-col h-dvh overflow-hidden">
-            <HeaderWidget />
+            <div className="relative flex flex-col h-dvh overflow-hidden">
+              <HeaderWidget />
 
-            <main className="flex-1 w-full mx-auto overflow-y-auto scrollbar-hide pb-24">
-              {children}
-            </main>
+              <main className="flex-1 w-full mx-auto overflow-y-auto scrollbar-hide pb-24">
+                {children}
+              </main>
 
-            <BottomNav />
-          </div>
+              <BottomNav />
+            </div>
+          </LocaleProvider>
         </QueryProvider>
       </body>
     </html>

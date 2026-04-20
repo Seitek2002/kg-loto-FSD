@@ -1,38 +1,54 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 
+import api from "@/shared/api/apiClient";
 import { useAuthStore } from "@/shared/model/auth";
 
-// Временная заглушка, пока нет реального бэкенда
-const financeApi = {
+interface BalanceResponse {
+  data: {
+    amount: string;
+    currency: string;
+  };
+}
+
+interface PaylinkResponse {
+  data: {
+    paylinkUrl: string;
+  };
+}
+
+// 🔥 Реальные запросы к API
+export const financeApi = {
+  // 1. Получение баланса
   getBalance: async () => {
-    // В реальном проекте: const { data } = await api.get('/me/balance/'); return data;
-    return { amount: 150 };
+    const { data } = await api.get<BalanceResponse>("/profile/balance");
+    return data.data; // Возвращает { amount: "7", currency: "KGS" }
   },
-  getWithdrawals: async () => {
-    // const { data } = await api.get('/me/withdrawals/'); return data;
-    return [
-      {
-        id: 1,
-        createdAt: "2026-04-02T12:00:00Z",
-        amount: 500,
-        method: "mbank",
-        status: "completed",
-      },
-      {
-        id: 2,
-        createdAt: "2026-04-01T10:00:00Z",
-        amount: 1000,
-        method: "visa",
-        status: "pending",
-      },
-    ];
-  },
+
+  // 2. Создание ссылки на оплату
   createPaylink: async (amount: string) => {
-    // const { data } = await api.post('/me/paylink/', { amount }); return data;
-    return { paylinkUrl: "https://mbank.kg/pay" }; // Заглушка перехода на оплату
+    // 🔥 Явно формируем строку, чтобы избежать проблем с сериализацией в apiClient
+    const bodyString = `amount=${encodeURIComponent(amount)}`;
+
+    const { data } = await api.post<PaylinkResponse>(
+      "/balance/paylink",
+      bodyString,
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      },
+    );
+
+    return data.data; // Возвращает { paylinkUrl: "https://..." }
+  },
+
+  // 3. История выводов (пока оставляем заглушку, если апи для истории еще нет)
+  getWithdrawals: async () => {
+    return [];
   },
 };
 
+// 🔥 Хук для баланса (Синхронизирует сервер с Zustand)
 export const useBalance = () => {
   const token = useAuthStore((state) => state.accessToken);
   const updateUser = useAuthStore((state) => state.updateUser);
@@ -41,15 +57,21 @@ export const useBalance = () => {
     queryKey: ["balance"],
     queryFn: async () => {
       const data = await financeApi.getBalance();
-      // Синхронизируем баланс с Zustand
+
+      // Синхронизируем баланс с Zustand, чтобы он обновился в шапке и кошельке.
+      // Бэкенд отдает строку (например, "7"), мы можем хранить ее как есть.
       updateUser({ balance: data.amount });
+
       return data;
     },
+    // Запрашиваем только если есть токен (юзер авторизован)
     enabled: !!token,
+    // Обновляем раз в 30 секунд (полезно для WebView)
     refetchInterval: 30000,
   });
 };
 
+// 🔥 Хук для пополнения
 export const useTopUp = () => {
   return useMutation({
     mutationFn: financeApi.createPaylink,
