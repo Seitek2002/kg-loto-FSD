@@ -34,8 +34,8 @@ export interface FetchTicketsParams {
 }
 
 export interface TicketDto {
-  ticket_id: string;
-  ticket_number: string;
+  ticketId: string;
+  ticketNumber: string;
   combination: number[];
   price: number;
   currency: string;

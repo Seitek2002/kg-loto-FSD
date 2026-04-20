@@ -71,23 +71,25 @@ export const DrawTicketsBlock = ({ lotteryId }: { lotteryId: string }) => {
           </p>
         </div>
       ) : (
-        availableTickets.map((ticket) => {
+        availableTickets.map((ticket, i) => {
           // Ищем, есть ли билет в корзине
-          const isInBasket = basketIds.includes(ticket.ticket_id);
+          const isInBasket = basketIds.includes(ticket.ticketId);
+
+          console.log(ticket);
 
           return (
             <DrawTicketCard
-              key={ticket.ticket_id}
-              ticketNumber={ticket.ticket_number}
+              key={ticket.ticketId}
+              ticketNumber={ticket.ticketNumber}
               price={ticket.price}
               selectedNumbers={ticket.combination}
               isInBasket={isInBasket}
               onToggle={() =>
                 toggleItem({
-                  id: ticket.ticket_id,
+                  id: ticket.ticketId,
                   price: ticket.price,
                   type: "other", // Логика super/other если понадобится
-                  ticketNumber: ticket.ticket_number,
+                  ticketNumber: ticket.ticketNumber,
                   combination: ticket.combination,
                   lotteryId: lotteryId,
                   drawId: currentDraw.drawId,
