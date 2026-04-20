@@ -1,0 +1,69 @@
+.html-content h1,
+.html-content h2,
+.html-content h3,
+.html-content h4,
+.html-content h5,
+.html-content h6 {
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: bold;
+  text-transform: uppercase;
+  font-family: var(--font-benzin);
+  color: #4b4b4b;
+}
+
+@media (min-width: 1024px) {
+  .html-content h1,
+  .html-content h2,
+  .html-content h3,
+  .html-content h4,
+  .html-content h5,
+  .html-content h6 {
+    font-size: 24px;
+    line-height: 32px;
+  }
+}
+
+.html-content p {
+  font-size: 12px;
+  line-height: 16px;
+  color: #6e6e6e;
+  margin-bottom: 24px;
+}
+
+@media (min-width: 1024px) {
+  .html-content p {
+    font-size: 20px;
+    line-height: 28px;
+  }
+}
+
+.html-content strong,
+.html-content b {
+  color: #4b4b4b;
+  font-weight: 700;
+}
+
+.html-content ul {
+  margin-bottom: 24px;
+  padding-left: 20px;
+}
+
+.html-content li {
+  margin-bottom: 12px;
+  position: relative;
+}
+
+.html-content li::before {
+  content: "•";
+  color: #ffd600;
+  font-weight: bold;
+  display: inline-block;
+  width: 1em;
+  margin-left: -1em;
+}
+
+.html-content a {
+  color: #ffd600;
+  text-decoration: underline;
+}

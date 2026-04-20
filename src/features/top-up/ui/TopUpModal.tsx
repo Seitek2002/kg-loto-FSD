@@ -11,7 +11,6 @@ import { X } from "lucide-react";
 import { useTopUp } from "@/entities/finance/api";
 
 import { Button } from "@/shared/ui/Button";
-import { Input } from "@/shared/ui/Input";
 
 interface TopUpModalProps {
   isOpen: boolean;
@@ -54,12 +53,11 @@ export const TopUpModal = ({ isOpen, onClose }: TopUpModalProps) => {
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-100 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
             className="absolute inset-0 bg-black/40 backdrop-blur-sm z-0"
             onClick={handleClose}
           />
@@ -68,8 +66,8 @@ export const TopUpModal = ({ isOpen, onClose }: TopUpModalProps) => {
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            transition={{ duration: 0.2, ease: "easeOut" }}
-            className="relative w-full max-w-md bg-[#F5F5F7] rounded-3xl p-6 lg:p-10 shadow-2xl z-10"
+            transition={{ duration: 0.2 }}
+            className="relative w-full max-w-md bg-[#F5F5F7] rounded-[24px] p-6 lg:p-10 shadow-2xl z-10"
           >
             <button
               onClick={handleClose}
@@ -89,12 +87,13 @@ export const TopUpModal = ({ isOpen, onClose }: TopUpModalProps) => {
               <label className="text-[13px] font-bold text-[#4B4B4B] ml-1">
                 Сумма пополнения (сом)
               </label>
-              <Input
+              <input
                 type="number"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
                 placeholder="Например: 100"
-                min={1}
+                min="1"
+                className="w-full bg-white rounded-[16px] px-5 py-4 text-[16px] font-bold text-[#4B4B4B] outline-none border-2 border-transparent focus:border-[#FFD600] transition-all shadow-sm placeholder:text-gray-300"
               />
             </div>
 
@@ -135,8 +134,8 @@ export const TopUpModal = ({ isOpen, onClose }: TopUpModalProps) => {
               isLoading={isPending}
               className={
                 isFormValid
-                  ? "shadow-[0_4px_14px_rgba(255,214,0,0.4)] bg-[#FFD600] text-[#4B4B4B]"
-                  : "bg-gray-200 text-gray-400 cursor-not-allowed active:scale-100"
+                  ? "w-full bg-[#FFD600] text-[#4B4B4B]"
+                  : "w-full bg-gray-200 text-gray-400 cursor-not-allowed"
               }
             >
               Перейти к оплате

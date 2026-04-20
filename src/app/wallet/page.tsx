@@ -70,19 +70,19 @@ export default function WalletPage() {
           </h2>
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
             <div className="text-[48px] lg:text-[64px] font-black text-[#4B4B4B] leading-none">
-              {user?.balance || "150"}{" "}
+              {user?.balance || "0"}{" "}
               <span className="underline text-[36px] lg:text-[48px]">с</span>
             </div>
             <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
               <Button
                 onClick={() => setIsTopUpModalOpen(true)}
-                className="bg-[#F58220] text-white py-4 px-8 text-[14px]"
+                className="bg-[#F58220] text-white py-4 px-8 text-[14px] rounded-full"
               >
                 Пополнить
               </Button>
               <Button
                 variant="outline"
-                className="py-4 px-8 text-[14px] border-2 border-[#F58220] text-[#F58220] bg-transparent"
+                className="py-4 px-8 text-[14px] border-2 border-[#F58220] text-[#F58220] bg-transparent rounded-full"
               >
                 Вывести
               </Button>
@@ -133,11 +133,6 @@ export default function WalletPage() {
                       {formatDate(tx.createdAt)}
                     </span>
                   </div>
-                  {tx.status === "rejected" && tx.rejectionReason && (
-                    <div className="text-[12px] text-red-500 mt-1">
-                      Причина: {tx.rejectionReason}
-                    </div>
-                  )}
                 </div>
               );
             })}

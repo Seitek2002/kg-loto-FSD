@@ -44,7 +44,7 @@ export const HeaderWidget = ({ className }: { className?: string }) => {
       </div>
 
       {/* Баланс */}
-      <Link href={"/balance"} className="flex items-center gap-1.5 px-2 py-1">
+      <Link href={"/wallet"} className="flex items-center gap-1.5 px-2 py-1">
         <Wallet size={20} className="text-[#4B4B4B]" strokeWidth={2} />
         <span className="font-benzin font-black text-[#FF8A00] text-sm md:text-base">
           {balance} <span className="underline underline-offset-2">с</span>

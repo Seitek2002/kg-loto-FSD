@@ -2,7 +2,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 
 import { useAuthStore } from "@/shared/model/auth";
 
-// Заглушка API-методов (чтобы код работал)
+// Временная заглушка, пока нет реального бэкенда
 const financeApi = {
   getBalance: async () => {
     // В реальном проекте: const { data } = await api.get('/me/balance/'); return data;
@@ -29,21 +29,20 @@ const financeApi = {
   },
   createPaylink: async (amount: string) => {
     // const { data } = await api.post('/me/paylink/', { amount }); return data;
-    return { paylinkUrl: "https://mbank.kg/pay" };
+    return { paylinkUrl: "https://mbank.kg/pay" }; // Заглушка перехода на оплату
   },
 };
 
 export const useBalance = () => {
   const token = useAuthStore((state) => state.accessToken);
+  const updateUser = useAuthStore((state) => state.updateUser);
 
   return useQuery({
     queryKey: ["balance"],
     queryFn: async () => {
       const data = await financeApi.getBalance();
-      const currentUser = useAuthStore.getState().user;
-      if (currentUser) {
-        // useAuthStore.setState({ user: { ...currentUser, balance: data.amount } });
-      }
+      // Синхронизируем баланс с Zustand
+      updateUser({ balance: data.amount });
       return data;
     },
     enabled: !!token,
