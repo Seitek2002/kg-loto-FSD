@@ -1,15 +1,22 @@
 "use client";
 
+import { useEffect, useState } from "react";
+
 import Image from "next/image";
 
+import { useCurrentDraw } from "@/entities/ticket/api";
+
 import { cn } from "@/shared/lib/utils";
+import { Skeleton } from "@/shared/ui/Skeleton";
 
 interface TicketsHeroProps {
+  lotteryId: string;
   activeTab: string;
   onTabChange: (tab: string) => void;
 }
 
 export const TicketsHeroWidget = ({
+  lotteryId,
   activeTab,
   onTabChange,
 }: TicketsHeroProps) => {
@@ -18,6 +25,51 @@ export const TicketsHeroWidget = ({
     { id: "rules", label: "Правила игры" },
     { id: "archive", label: "Архив тиражей" },
   ];
+
+  const { data: currentDraw, isLoading } = useCurrentDraw(lotteryId);
+
+  // --- ЛОГИКА ТАЙМЕРА ---
+  const [timeLeft, setTimeLeft] = useState({
+    days: 0,
+    hours: 0,
+    minutes: 0,
+    seconds: 0,
+  });
+
+  useEffect(() => {
+    if (!currentDraw) return;
+
+    // Собираем полную дату тиража: "2026-04-10T20:00:00"
+    const targetDate = new Date(
+      `${currentDraw.drawDate}T${currentDraw.drawTime}`,
+    );
+
+    const updateTimer = () => {
+      const now = new Date();
+      const difference = targetDate.getTime() - now.getTime();
+
+      if (difference > 0) {
+        setTimeLeft({
+          days: Math.floor(difference / (1000 * 60 * 60 * 24)),
+          hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
+          minutes: Math.floor((difference / 1000 / 60) % 60),
+          seconds: Math.floor((difference / 1000) % 60),
+        });
+      } else {
+        setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+      }
+    };
+
+    updateTimer(); // Вызываем сразу
+    const interval = setInterval(updateTimer, 1000); // И каждую секунду
+
+    return () => clearInterval(interval);
+  }, [currentDraw]);
+
+  // Форматируем время с ведущими нулями (09:05:01)
+  const formattedTime = `${String(timeLeft.hours).padStart(2, "0")}:${String(
+    timeLeft.minutes,
+  ).padStart(2, "0")}:${String(timeLeft.seconds).padStart(2, "0")}`;
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6 mt-6">
@@ -47,7 +99,11 @@ export const TicketsHeroWidget = ({
             Суперприз от
           </div>
           <div className="text-[#E2FF5A] text-[32px] sm:text-4xl lg:text-[64px] leading-none font-black font-benzin drop-shadow-[0_4px_10px_rgba(0,0,0,0.3)]">
-            6 000 000 <span className="underline">С</span>
+            {isLoading ? (
+              <Skeleton className="w-[200px] h-[40px] lg:h-[70px] bg-white/20 mt-2" />
+            ) : (
+              currentDraw?.jackpotAmountDisplay || "0 с"
+            )}
           </div>
         </div>
 
@@ -75,24 +131,45 @@ export const TicketsHeroWidget = ({
         {/* КАРТОЧКА ТИРАЖА */}
         <div className="bg-white rounded-[24px] lg:rounded-[32px] p-6 lg:p-8 shadow-sm flex flex-col justify-center flex-1">
           <h2 className="text-[20px] lg:text-[26px] font-bold text-[#4B4B4B] text-center mb-6 lg:mb-8">
-            Тираж №005034
+            {isLoading ? (
+              <Skeleton className="h-8 w-3/4 mx-auto" />
+            ) : (
+              currentDraw?.title || "Тираж закрыт"
+            )}
           </h2>
+
           <div className="flex flex-col gap-4 text-[13px] lg:text-[16px]">
             <div className="flex justify-between items-center">
               <span className="text-[#737373] font-medium">Дата тиража:</span>
-              <span className="text-[#4B4B4B] font-bold">4 апреля 2026</span>
+              {isLoading ? (
+                <Skeleton className="h-5 w-24" />
+              ) : (
+                <span className="text-[#4B4B4B] font-bold">
+                  {currentDraw?.drawDateHuman || "-"}
+                </span>
+              )}
             </div>
             <div className="flex justify-between items-center">
               <span className="text-[#737373] font-medium">Суперприз от:</span>
-              <span className="text-[#4B4B4B] font-bold">
-                20 000 <span className="underline">С</span>
-              </span>
+              {isLoading ? (
+                <Skeleton className="h-5 w-24" />
+              ) : (
+                <span className="text-[#4B4B4B] font-bold">
+                  {currentDraw?.jackpotAmountDisplay || "-"}
+                </span>
+              )}
             </div>
             <div className="flex justify-between items-center">
               <span className="text-[#737373] font-medium">
                 Место проведения:
               </span>
-              <span className="text-[#4B4B4B] font-bold">Бишкек</span>
+              {isLoading ? (
+                <Skeleton className="h-5 w-20" />
+              ) : (
+                <span className="text-[#4B4B4B] font-bold">
+                  {currentDraw?.location || "Бишкек"}
+                </span>
+              )}
             </div>
           </div>
         </div>
@@ -113,20 +190,20 @@ export const TicketsHeroWidget = ({
             </span>
 
             <div className="flex items-stretch justify-center gap-2 lg:gap-4 w-full">
-              <div className="flex flex-col bg-white/10 backdrop-blur-md border border-white/40 rounded-[12px] lg:rounded-[16px] p-2 lg:p-3">
+              <div className="flex flex-col bg-white/10 backdrop-blur-md border border-white/40 rounded-[12px] lg:rounded-[16px] p-2 lg:p-3 w-[70px] lg:w-[100px] items-center">
                 <span className="text-white text-[11px] lg:text-[14px] font-medium mb-1">
                   Дней
                 </span>
                 <span className="text-white text-[28px] lg:text-[40px] font-black leading-none tracking-wide">
-                  24
+                  {isLoading ? "-" : timeLeft.days}
                 </span>
               </div>
-              <div className="flex flex-col bg-white/10 backdrop-blur-md border border-white/40 rounded-[12px] lg:rounded-[16px] p-2 lg:p-3">
+              <div className="flex flex-col bg-white/10 backdrop-blur-md border border-white/40 rounded-[12px] lg:rounded-[16px] p-2 lg:p-3 w-[140px] lg:w-[200px] items-center">
                 <span className="text-white text-[11px] lg:text-[14px] font-medium mb-1">
                   Часов
                 </span>
                 <span className="text-white text-[28px] lg:text-[40px] font-black leading-none tracking-wide">
-                  12:34:38
+                  {isLoading ? "--:--:--" : formattedTime}
                 </span>
               </div>
             </div>

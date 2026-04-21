@@ -3,11 +3,11 @@
 import { useState } from "react";
 
 import { CartDrawer } from "@/widgets/CartDrawer";
+import { DrawArchiveBlock } from "@/widgets/DrawArchiveBlock";
+import { DrawRulesBlock } from "@/widgets/DrawRulesBlock";
 import { DrawTicketsBlock } from "@/widgets/DrawTicketsBlock";
 import { PopularTicketsWidget } from "@/widgets/PopularTickets";
 import { TicketsHeroWidget } from "@/widgets/TicketsHero";
-import { DrawRulesBlock } from '@/widgets/DrawRulesBlock';
-import { DrawArchiveBlock } from '@/widgets/DrawArchiveBlock';
 import { WinnersHistoryWidget } from "@/widgets/WinnersHistory";
 
 interface LotteryClientProps {
@@ -19,7 +19,11 @@ export const LotteryClient = ({ lotteryId }: LotteryClientProps) => {
 
   return (
     <>
-      <TicketsHeroWidget activeTab={activeTab} onTabChange={setActiveTab} />
+      <TicketsHeroWidget
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        lotteryId={lotteryId}
+      />
 
       {activeTab === "tickets" && (
         <div className="mt-12 lg:mt-16">

@@ -4,10 +4,21 @@ import api from "@/shared/api/apiClient";
 
 export interface DrawDto {
   drawId: string;
-  lotteryId: string;
+  title: string;
   drawNumber: number;
-  status: string;
+  drawNumberDisplay: string;
+  drawDate: string;
+  drawDateHuman: string;
+  drawTime: string;
+  drawTimeDisplay: string;
   jackpotAmount: number;
+  jackpotAmountDisplay: string;
+  location: string;
+  status: "open" | "closed" | "completed";
+  salesStartAt: string;
+  salesStartAtDisplay: string;
+  salesEndAt: string;
+  salesEndAtDisplay: string;
 }
 
 // --- ИНТЕРФЕЙСЫ ДЛЯ ПОКУПКИ (POST) ---
@@ -69,11 +80,24 @@ export const ticketApi = {
   },
 
   getCurrentDraw: async (lotteryId: string) => {
-    const { data } = await api.get<{ data: DrawDto[] }>('/draws/current', {
-      params: { lotteryId, status: 'open' }
+    // Внимание на тип возвращаемых данных. У нас есть data и meta.
+    const response = await api.get<{
+      success: boolean;
+      data: any[];
+      meta: {
+        drawCards?: DrawDto[]; // Тот самый конвертированный в camelCase массив
+        lotteryUi?: any;
+      };
+    }>("/draws/current", {
+      params: { lotteryId },
     });
-    // Бэкенд возвращает массив, берем первый открытый тираж
-    return data.data[0] || null;
+
+    const drawCards = response.data?.meta?.drawCards || [];
+
+    // Ищем открытый тираж среди богатых карточек
+    const openDraw = drawCards.find((draw) => draw.status === "open");
+
+    return openDraw || null;
   },
 };
 
@@ -97,7 +121,7 @@ export const usePurchaseTickets = () => {
 
 export const useCurrentDraw = (lotteryId: string) => {
   return useQuery({
-    queryKey: ['currentDraw', lotteryId],
+    queryKey: ["currentDraw", lotteryId],
     queryFn: () => ticketApi.getCurrentDraw(lotteryId),
     enabled: !!lotteryId,
   });
