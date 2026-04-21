@@ -2,68 +2,46 @@
 
 import { useMemo, useState } from "react";
 
+import { Loader2 } from "lucide-react";
+
+import { useMyTickets } from "@/entities/ticket/api";
+import { MyTicketCard } from "@/entities/ticket/ui/MyTicketCard";
+
 import { cn } from "@/shared/lib/utils";
 import { Button } from "@/shared/ui/Button";
 
-import { MyTicketCard } from "@/entities/ticket/ui/MyTicketCard";
-
-// Моковые данные
-const MOCK_TICKETS = [
-  {
-    id: "1",
-    name: "Мен миллионер",
-    price: 500,
-    date: "12.09.2026",
-    prize: "10 000",
-    logo: "/images/draw-tickets/super-jackpot-logo.png",
-    status: "winning",
-  },
-  {
-    id: "2",
-    name: "Саткын",
-    price: 200,
-    date: "11.09.2026",
-    prize: "0",
-    logo: "/images/draw-tickets/super-jackpot-logo.png",
-    status: "unchecked",
-  },
-  {
-    id: "3",
-    name: "Мен миллионер",
-    price: 500,
-    date: "10.09.2026",
-    prize: "50 000",
-    logo: "/images/draw-tickets/super-jackpot-logo.png",
-    status: "winning",
-  },
-  {
-    id: "4",
-    name: "Алга",
-    price: 100,
-    date: "05.09.2026",
-    prize: "0",
-    logo: "/images/draw-tickets/super-jackpot-logo.png",
-    status: "losing",
-  },
-] as const;
+// 🔥 Импортируем хук
 
 const TABS = ["Выигрышные", "Не проверены", "Все билеты"];
+
+// Вспомогательная функция для форматирования даты
+const formatDate = (isoString: string) => {
+  if (!isoString) return "";
+  const date = new Date(isoString);
+  return date.toLocaleDateString("ru-RU", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  });
+};
 
 export const TicketsClient = () => {
   const [activeTab, setActiveTab] = useState(TABS[0]);
 
+  const { data: tickets = [], isLoading } = useMyTickets();
+
   // Фильтрация
   const filteredTickets = useMemo(() => {
-    return MOCK_TICKETS.filter((t) => {
+    return tickets.filter((t) => {
       if (activeTab === "Выигрышные") return t.status === "winning";
-      if (activeTab === "Не проверены") return t.status === "unchecked";
+      if (activeTab === "Не проверены") return t.status === "sold"; // sold = куплен, но тираж еще не прошел
       return true; // 'Все билеты'
     });
-  }, [activeTab]);
+  }, [activeTab, tickets]);
 
   return (
     <div className="bg-white min-h-[80vh] rounded-t-[32px] sm:rounded-[40px] shadow-sm px-4 sm:px-8 pt-6 pb-10">
-      {/* КАСТОМНЫЕ ТАБЫ (Как на скриншоте) */}
+      {/* ТАБЫ */}
       <div className="flex gap-6 border-b border-gray-100 mb-6 overflow-x-auto scrollbar-hide">
         {TABS.map((tab) => (
           <button
@@ -84,21 +62,38 @@ export const TicketsClient = () => {
         ))}
       </div>
 
-      {/* СПИСОК БИЛЕТОВ */}
-      {filteredTickets.length > 0 ? (
+      {/* СПИСОК БИЛЕТОВ ИЛИ СОСТОЯНИЕ ЗАГРУЗКИ */}
+      {isLoading ? (
+        <div className="flex flex-col items-center justify-center py-20">
+          <Loader2 className="w-10 h-10 animate-spin text-[#FF7600] mb-4" />
+          <p className="text-[#737373] font-medium">Загружаем ваши билеты...</p>
+        </div>
+      ) : filteredTickets.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {filteredTickets.map((ticket) => (
-            <MyTicketCard
-              key={ticket.id}
-              ticketName={ticket.name}
-              price={ticket.price}
-              date={ticket.date}
-              prizeAmount={ticket.prize}
-              logoSrc={ticket.logo}
-              status={ticket.status}
-              showButton={ticket.status !== "losing"}
-            />
-          ))}
+          {filteredTickets.map((ticket) => {
+            // Маппинг статусов для UI компонента
+            let uiStatus: "winning" | "unchecked" | "losing" = "unchecked";
+            if (ticket.status === "winning") uiStatus = "winning";
+            if (ticket.status === "losing") uiStatus = "losing";
+
+            // Формируем красивое название из drawId (например, из "draw-20260410-001" берем "001")
+            const drawNumberStr = ticket.drawId.split("-").pop() || "";
+
+            return (
+              <MyTicketCard
+                key={ticket.ticketId}
+                ticketName={`Тираж №${drawNumberStr}`} // Название лотереи или тиража
+                price={ticket.price}
+                date={formatDate(ticket.purchaseDate)}
+                prizeAmount={
+                  ticket.prizeAmount ? String(ticket.prizeAmount) : "0"
+                } // Если бэк не дал prizeAmount, ставим 0
+                logoSrc="/images/draw-tickets/super-jackpot-logo.png" // Логотип пока статичный
+                status={uiStatus}
+                showButton={uiStatus !== "losing"}
+              />
+            );
+          })}
         </div>
       ) : (
         <div className="flex flex-col items-center justify-center py-20 text-center">

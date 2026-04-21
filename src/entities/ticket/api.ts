@@ -2,6 +2,19 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 
 import api from "@/shared/api/apiClient";
 
+export interface MyTicketDto {
+  ticketId: string;
+  lotteryId: string;
+  drawId: string;
+  ticketNumber: string;
+  combination: number[];
+  price: number;
+  currency: string;
+  status: "sold" | "winning" | "losing"; // Бэк отдает sold для купленных
+  purchaseDate: string;
+  prizeAmount?: number; // На случай, если бэк отдает выигрыш для статуса winning
+}
+
 export interface DrawDto {
   drawId: string;
   title: string;
@@ -99,6 +112,11 @@ export const ticketApi = {
 
     return openDraw || null;
   },
+
+  getMyTickets: async () => {
+    const { data } = await api.get<{ data: MyTicketDto[] }>("/me/balance/tickets/");
+    return data.data;
+  },
 };
 
 // --- ХУКИ ---
@@ -124,5 +142,12 @@ export const useCurrentDraw = (lotteryId: string) => {
     queryKey: ["currentDraw", lotteryId],
     queryFn: () => ticketApi.getCurrentDraw(lotteryId),
     enabled: !!lotteryId,
+  });
+};
+
+export const useMyTickets = () => {
+  return useQuery({
+    queryKey: ["myTickets"],
+    queryFn: ticketApi.getMyTickets,
   });
 };
