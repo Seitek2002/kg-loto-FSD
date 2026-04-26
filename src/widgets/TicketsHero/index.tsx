@@ -85,7 +85,7 @@ export const TicketsHeroWidget = ({
         />
 
         <div className="relative z-10 flex flex-col items-left self-start pt-6 sm:pt-10 lg:pt-16 pl-4 sm:pl-8 lg:pl-16">
-          <div className="relative w-[100px] h-[75px] sm:h-[100px] mb-2 sm:mb-4">
+          <div className="relative w-25 h-18.75 sm:h-25 mb-2 sm:mb-4">
             <Image
               src="/images/draw-tickets/super-jackpot-logo.png"
               alt="Супер Джекпот"
@@ -206,7 +206,7 @@ export const TicketsHeroWidget = ({
                   {isLoading ? "-" : timeLeft.days}
                 </span>
               </div>
-              <div className="flex flex-col bg-white/10 backdrop-blur-md border border-white/40 rounded-xl lg:rounded-2xl py-2 px-4 lg:p-3 w-35 lg:w-50 items-center">
+              <div className="flex flex-col bg-white/10 backdrop-blur-md border border-white/40 rounded-xl lg:rounded-2xl py-2 px-4 items-center">
                 <span className="text-white text-[11px] lg:text-[14px] font-medium mb-1">
                   Часов
                 </span>
