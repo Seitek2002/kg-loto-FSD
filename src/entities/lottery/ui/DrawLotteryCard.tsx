@@ -19,7 +19,7 @@ export const DrawLotteryCard = ({ lottery }: { lottery: CurrentLottery }) => {
       className="group relative w-full aspect-video sm:aspect-4/2.5 rounded-3xl overflow-hidden block active:scale-[0.98] transition-transform duration-200"
     >
       <Image
-        src={fallbackImage}
+        src={lottery.imageUrl || fallbackImage}
         alt={lottery.name}
         fill
         unoptimized // 🔥 Обязательно для WebView статики

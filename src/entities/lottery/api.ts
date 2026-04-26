@@ -17,6 +17,7 @@ export interface CurrentLottery {
   saleStatus: string;
   saleStartAt: string;
   saleEndAt: string;
+  imageUrl?: string;
 }
 
 export const useLotteries = () => {
