@@ -69,7 +69,7 @@ export const CartDrawer = () => {
         refetchBalance();
         setIsExpanded(false);
         alert("Билеты успешно приобретены!"); // Позже заменим на красивый SuccessModal
-        router.push("/profile");
+        router.push("/tickets");
       },
       onError: (error) => {
         console.error("Ошибка при покупке:", error);

@@ -157,7 +157,7 @@ export const CartClient = () => {
       onSuccess: () => {
         clearCart();
         refetchBalance();
-        router.push("/profile");
+        router.push("/tickets");
       },
       onError: (error) => {
         console.error("Ошибка покупки:", error);
