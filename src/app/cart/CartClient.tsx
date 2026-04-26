@@ -179,8 +179,6 @@ export const CartClient = () => {
     );
   }
 
-  console.log(items);
-
   return (
     <>
       <div className="flex flex-col lg:flex-row gap-6 items-start">
