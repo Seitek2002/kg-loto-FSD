@@ -35,7 +35,8 @@ export default async function Home() {
     // Если эндпоинт другой, просто поменяй строку ниже
     const { data } = await api.get("/page-texts");
     // console.log("=== СЛОВАРЬ ИЗ АДМИНКИ (КОПИРОВАТЬ ОТСЮДА) ===");
-    console.log(JSON.stringify(data, null, 2)); // stringify сделает вывод красивым и удобным для копирования
+    // console.log(JSON.stringify(data, null, 2)); // stringify сделает вывод красивым и удобным для копирования
+    JSON.stringify(data, null, 2)
     // console.log("===============================================");
   } catch (error) {
     console.error("Не удалось получить словарь. Проверь эндпоинт:", error);

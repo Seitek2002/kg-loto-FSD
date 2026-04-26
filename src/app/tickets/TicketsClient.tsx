@@ -25,6 +25,8 @@ export const TicketsClient = () => {
     });
   }, [activeTab, tickets]);
 
+  console.log(tickets);
+
   return (
     <div className="bg-white min-h-[80vh] rounded-t-4xl sm:rounded-[40px] shadow-sm px-4 sm:px-8 pt-6 pb-10">
       {/* ТАБЫ */}
