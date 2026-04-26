@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 export default function TicketsPage() {
   return (
     <div className="min-h-screen bg-[#F5F5F5] font-rubik pt-6 pb-24">
-      <div className="max-w-[1000px] mx-auto">
+      <div className="max-w-250 mx-auto">
         <TicketsClient />
       </div>
     </div>

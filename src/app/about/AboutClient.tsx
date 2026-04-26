@@ -14,37 +14,37 @@ import {
   type AboutCompanyData,
   getAboutCompanyData,
 } from "@/entities/company/api";
-import { type NewsItem, getNewsData } from "@/entities/news/api";
+import { useNews } from "@/entities/news/api";
 import { ArticleCard } from "@/entities/news/ui/ArticleCard";
 
 export const AboutClient = () => {
   const mounted = useMounted();
   const [aboutData, setAboutData] = useState<AboutCompanyData | null>(null);
-  const [news, setNews] = useState<NewsItem[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isAboutLoading, setIsAboutLoading] = useState(true);
+
+  // 🔥 Получаем новости через React Query
+  const { data: allNews = [], isLoading: isNewsLoading } = useNews();
+  const news = allNews.slice(0, 3); // Нам нужны только 3 последние новости для сайдбара
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchAboutData = async () => {
       const savedLocale = localStorage.getItem("NEXT_LOCALE") || "ru";
-
-      const [aboutRes, newsRes] = await Promise.all([
-        getAboutCompanyData(savedLocale),
-        getNewsData(savedLocale),
-      ]);
-
+      const aboutRes = await getAboutCompanyData(savedLocale);
       setAboutData(aboutRes);
-      setNews(newsRes.slice(0, 3));
-      setIsLoading(false);
+      setIsAboutLoading(false);
     };
 
-    fetchData();
+    fetchAboutData();
   }, []);
 
   if (!mounted) return null;
 
+  // Общий лоадер, пока грузятся и новости, и страница "О компании"
+  const isLoading = isAboutLoading || isNewsLoading;
+
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-[#F5F5F5]">
         <Loader2 className="w-10 h-10 animate-spin text-[#FF7600]" />
       </div>
     );
@@ -55,7 +55,7 @@ export const AboutClient = () => {
 
   return (
     <div className="min-h-screen bg-[#F5F5F5] font-rubik pb-24">
-      <div className="max-w-[1200px] mx-auto pt-6 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-300 mx-auto pt-6 px-4 sm:px-6 lg:px-8">
         {/* КНОПКА НАЗАД */}
         <nav className="flex items-center mb-6 lg:mb-10">
           <Link
@@ -69,7 +69,7 @@ export const AboutClient = () => {
 
         {/* ГЛАВНОЕ ФОТО (Баннер) */}
         {aboutData?.image && (
-          <div className="w-full aspect-video sm:aspect-[21/9] min-h-[200px] relative rounded-[32px] overflow-hidden mb-8 lg:mb-12 shadow-sm">
+          <div className="w-full aspect-video sm:aspect-21/9 min-h-50 relative rounded-4xl overflow-hidden mb-8 lg:mb-12 shadow-sm">
             <Image
               src={aboutData.image}
               alt={displayTitle}
@@ -84,7 +84,7 @@ export const AboutClient = () => {
         {/* ОСНОВНОЙ КОНТЕНТ (2 КОЛОНКИ НА ПК) */}
         <div className="flex flex-col lg:flex-row gap-8 lg:gap-12 items-start">
           {/* ЛЕВАЯ КОЛОНКА: ДИНАМИЧЕСКИЙ HTML */}
-          <div className="w-full lg:w-[65%] bg-white rounded-[32px] p-6 lg:p-10 shadow-sm border border-gray-100 text-[#4B4B4B]">
+          <div className="w-full lg:w-[65%] bg-white rounded-4xl p-6 lg:p-10 shadow-sm border border-gray-100 text-[#4B4B4B]">
             <div
               className="html-content leading-relaxed"
               dangerouslySetInnerHTML={{ __html: htmlContent }}
@@ -100,7 +100,6 @@ export const AboutClient = () => {
 
               <div className="flex flex-col gap-4">
                 {news.map((item) => (
-                  // 🔥 ИСПРАВЛЕНИЕ: Убрал h-[300px], теперь карточка не будет вылезать за края обертки
                   <div key={item.id} className="w-full">
                     <ArticleCard
                       id={item.id}

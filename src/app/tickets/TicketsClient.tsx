@@ -10,37 +10,23 @@ import { MyTicketCard } from "@/entities/ticket/ui/MyTicketCard";
 import { cn } from "@/shared/lib/utils";
 import { Button } from "@/shared/ui/Button";
 
-// 🔥 Импортируем хук
-
-const TABS = ["Выигрышные", "Не проверены", "Все билеты"];
-
-// Вспомогательная функция для форматирования даты
-const formatDate = (isoString: string) => {
-  if (!isoString) return "";
-  const date = new Date(isoString);
-  return date.toLocaleDateString("ru-RU", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-  });
-};
+const TABS = ["Все билеты", "Выигрышные", "Не проверены"];
 
 export const TicketsClient = () => {
   const [activeTab, setActiveTab] = useState(TABS[0]);
-
   const { data: tickets = [], isLoading } = useMyTickets();
 
   // Фильтрация
   const filteredTickets = useMemo(() => {
     return tickets.filter((t) => {
       if (activeTab === "Выигрышные") return t.status === "winning";
-      if (activeTab === "Не проверены") return t.status === "sold"; // sold = куплен, но тираж еще не прошел
+      if (activeTab === "Не проверены") return t.status === "sold";
       return true; // 'Все билеты'
     });
   }, [activeTab, tickets]);
 
   return (
-    <div className="bg-white min-h-[80vh] rounded-t-[32px] sm:rounded-[40px] shadow-sm px-4 sm:px-8 pt-6 pb-10">
+    <div className="bg-white min-h-[80vh] rounded-t-4xl sm:rounded-[40px] shadow-sm px-4 sm:px-8 pt-6 pb-10">
       {/* ТАБЫ */}
       <div className="flex gap-6 border-b border-gray-100 mb-6 overflow-x-auto scrollbar-hide">
         {TABS.map((tab) => (
@@ -56,7 +42,7 @@ export const TicketsClient = () => {
           >
             {tab}
             {activeTab === tab && (
-              <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#4B4B4B] rounded-t-full" />
+              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#4B4B4B] rounded-t-full" />
             )}
           </button>
         ))}
@@ -76,21 +62,25 @@ export const TicketsClient = () => {
             if (ticket.status === "winning") uiStatus = "winning";
             if (ticket.status === "losing") uiStatus = "losing";
 
-            // Формируем красивое название из drawId (например, из "draw-20260410-001" берем "001")
-            const drawNumberStr = ticket.drawId.split("-").pop() || "";
+            // Достаем номер тиража из drawId (например "001" из "draw-20260410-001")
+            const drawNumberStr = ticket.drawId?.split("-").pop() || "";
 
             return (
               <MyTicketCard
                 key={ticket.ticketId}
-                ticketName={`Тираж №${drawNumberStr}`} // Название лотереи или тиража
-                price={ticket.price}
-                date={formatDate(ticket.purchaseDate)}
+                ticketName={ticket.name || `Тираж №${drawNumberStr}`}
+                price={Number(ticket.price)}
+                date={ticket.purchaseDateDisplay || ticket.purchaseDate}
                 prizeAmount={
                   ticket.prizeAmount ? String(ticket.prizeAmount) : "0"
-                } // Если бэк не дал prizeAmount, ставим 0
-                logoSrc="/images/draw-tickets/super-jackpot-logo.png" // Логотип пока статичный
+                }
+                logoSrc={
+                  ticket.logo || "/images/draw-tickets/super-jackpot-logo.png"
+                }
                 status={uiStatus}
                 showButton={uiStatus !== "losing"}
+                drawNumber={drawNumberStr}
+                combination={ticket.combination} // 🔥 Прокидываем комбинацию
               />
             );
           })}
@@ -101,7 +91,7 @@ export const TicketsClient = () => {
           <h3 className="text-[18px] font-bold text-[#4B4B4B] mb-2">
             Билетов не найдено
           </h3>
-          <p className="text-[#737373] text-[14px] max-w-[250px] mb-6">
+          <p className="text-[#737373] text-[14px] max-w-62.5 mb-6">
             В этой категории у вас пока нет билетов.
           </p>
           <Button

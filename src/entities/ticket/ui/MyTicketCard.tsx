@@ -14,7 +14,8 @@ export interface MyTicketCardProps {
   status?: "winning" | "unchecked" | "losing";
   badge?: { text: string; variant: "success" | "waiting" | "processing" };
   showButton?: boolean;
-  drawNumber?: string; // 🔥 Добавили номер тиража
+  drawNumber?: string;
+  combination?: number[]; // 🔥 Добавили пропс для комбинации
   onAction?: () => void;
 }
 
@@ -28,6 +29,7 @@ export const MyTicketCard = ({
   badge,
   showButton = true,
   drawNumber,
+  combination, // 🔥 Достаем из пропсов
   onAction,
 }: MyTicketCardProps) => {
   const cleanAmount = prizeAmount.replace(/\s/g, "");
@@ -38,7 +40,7 @@ export const MyTicketCard = ({
   const isHighlighted = !isNumeric || numericValue >= 10000;
 
   return (
-    <div className="flex flex-col h-fit bg-white border border-[#EAEAEA] rounded-[24px] p-5 shadow-sm">
+    <div className="flex flex-col h-fit bg-white border border-[#EAEAEA] rounded-3xl p-5 shadow-sm">
       {/* ВЕРХНЯЯ ЧАСТЬ: Приз и Бейджик */}
       {status !== "unchecked" && (
         <div className="mb-4 border-b border-[#EAEAEA] pb-4 flex justify-between items-center">
@@ -72,14 +74,14 @@ export const MyTicketCard = ({
             )}
           </div>
 
-          {/* Бейджик статуса (как на скрине Призов) */}
+          {/* Бейджик статуса */}
           {badge && (
             <div
               className={cn(
                 "px-4 py-1.5 rounded-full text-[13px] font-bold whitespace-nowrap",
                 badge.variant === "success" && "bg-[#D1F5D3] text-[#1FAF38]",
-                badge.variant === "waiting" && "bg-[#F3F4F6] text-[#4B4B4B]", // Серый для ожидания
-                badge.variant === "processing" && "bg-[#FFF0D4] text-[#F58220]", // Оранжевый для обработки
+                badge.variant === "waiting" && "bg-[#F3F4F6] text-[#4B4B4B]",
+                badge.variant === "processing" && "bg-[#FFF0D4] text-[#F58220]",
               )}
             >
               {badge.text}
@@ -89,20 +91,18 @@ export const MyTicketCard = ({
       )}
 
       {/* ИНФОРМАЦИЯ О БИЛЕТЕ */}
-      <div
-        className={cn("flex justify-between items-start", showButton && "mb-5")}
-      >
+      <div className="flex justify-between items-start mb-4">
         <div className="flex flex-col flex-1 pr-2">
           <h3 className="text-[18px] sm:text-[20px] font-bold text-[#4B4B4B] mb-2 leading-tight">
             {ticketName}
           </h3>
           <div className="text-[13px] text-[#737373] flex flex-col gap-1 font-medium">
-            {drawNumber && <span>Тираж {drawNumber}</span>}
+            {drawNumber && <span>Тираж №{drawNumber}</span>}
             <span>Стоимость: {price}</span>
             <span>Дата покупки: {date}</span>
           </div>
         </div>
-        <div className="relative w-[90px] h-[35px] shrink-0 mt-1">
+        <div className="relative w-22.5 h-8.75 shrink-0 mt-1">
           <Image
             src={logoSrc}
             alt={ticketName}
@@ -113,11 +113,25 @@ export const MyTicketCard = ({
         </div>
       </div>
 
-      {/* КНОПКА ПОЛУЧИТЬ / ПРОВЕРИТЬ (Для страницы "Билеты") */}
+      {/* 🔥 ОТРИСОВКА ВЫБРАННОЙ КОМБИНАЦИИ (Зеленые шарики) */}
+      {combination && combination.length > 0 && (
+        <div className="flex flex-wrap gap-2 mb-5">
+          {combination.map((num, idx) => (
+            <div
+              key={idx}
+              className="w-10 h-10 rounded-full bg-[#00C814] text-white flex items-center justify-center font-bold text-[16px] shadow-sm"
+            >
+              {num}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* КНОПКА ПОЛУЧИТЬ / ПРОВЕРИТЬ */}
       {status !== "losing" && showButton && (
         <Button
           onClick={onAction}
-          className="w-full bg-[#4B4B4B] text-white py-3.5 rounded-[16px] text-[14px]"
+          className="w-full bg-[#4B4B4B] hover:bg-gray-800 text-white py-3.5 rounded-2xl text-[14px]"
         >
           {status === "unchecked" ? "ПРОВЕРИТЬ" : "ПОЛУЧИТЬ"}
         </Button>

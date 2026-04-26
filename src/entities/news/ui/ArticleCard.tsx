@@ -45,7 +45,7 @@ export const ArticleCard = ({
     <Link
       href={href}
       className={cn(
-        "relative w-full h-[400px] sm:h-[460px] rounded-[32px] p-8 flex flex-col justify-between overflow-hidden border border-gray-100/50 shadow-sm transition-transform hover:scale-[1.01] group cursor-pointer",
+        "relative w-full h-[400px] sm:h-[460px] rounded-4xl p-8 flex flex-col justify-between overflow-hidden border border-gray-100/50 shadow-sm transition-transform hover:scale-[1.01] group cursor-pointer",
         !hasImage && theme === "dark" && "bg-white",
         !hasImage && theme === "light" && "bg-[#4B4B4B]",
         !hasImage && theme === "blue" && "bg-[#6F51FF]",

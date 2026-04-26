@@ -1,3 +1,5 @@
+import { useQuery } from "@tanstack/react-query";
+
 import api from "@/shared/api/apiClient";
 
 export interface PaginatedResult<T> {
@@ -25,37 +27,35 @@ export interface NewsItem {
   descriptionPosition: "none" | "top" | "bottom";
 }
 
-// Получение списка новостей
-export async function getNewsData(locale: string = "ru"): Promise<NewsItem[]> {
-  try {
-    const { data } = await api.get<ApiResponse<PaginatedResult<NewsItem>>>(
-      "/news/",
-      {
-        headers: { "Accept-Language": locale },
-      },
-    );
+export const newsApi = {
+  // Получение списка новостей
+  getNews: async (): Promise<NewsItem[]> => {
+    // Язык подхватится автоматически перехватчиками axios или браузером
+    const { data } =
+      await api.get<ApiResponse<PaginatedResult<NewsItem>>>("/news/");
     return data.data.results || [];
-  } catch (error) {
-    console.error("News Error:", error);
-    return [];
-  }
-}
+  },
 
-// Получение детальной новости
-export async function getNewsDetail(
-  slugOrId: string,
-  locale: string = "ru",
-): Promise<NewsItem | null> {
-  try {
-    const { data } = await api.get<ApiResponse<NewsItem>>(
-      `/news/${slugOrId}/`,
-      {
-        headers: { "Accept-Language": locale },
-      },
-    );
+  // Получение детальной новости
+  getNewsDetail: async (slugOrId: string): Promise<NewsItem | null> => {
+    const { data } = await api.get<ApiResponse<NewsItem>>(`/news/${slugOrId}/`);
     return data.data;
-  } catch (error) {
-    console.error(`Error fetching news ${slugOrId}:`, error);
-    return null;
-  }
-}
+  },
+};
+
+// --- ХУКИ ---
+export const useNews = () => {
+  return useQuery({
+    queryKey: ["news"],
+    queryFn: newsApi.getNews,
+    initialData: [], // Чтобы при первой отрисовке не было undefined
+  });
+};
+
+export const useNewsDetail = (slugOrId: string) => {
+  return useQuery({
+    queryKey: ["news", slugOrId],
+    queryFn: () => newsApi.getNewsDetail(slugOrId),
+    enabled: !!slugOrId, // Запрос не пойдет, если нет slug
+  });
+};

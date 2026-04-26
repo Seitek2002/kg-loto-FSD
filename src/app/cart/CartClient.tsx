@@ -60,7 +60,7 @@ const RealQuickAddTicket = ({
   };
 
   return (
-    <div className="bg-white rounded-[24px] p-5 shadow-sm border border-gray-100 flex flex-col relative mb-4">
+    <div className="bg-white rounded-3xl p-5 shadow-sm border border-gray-100 flex flex-col relative mb-4">
       <div className="absolute -left-2 top-[30px] w-4 h-4 bg-[#F5F5F5] rounded-full border-r border-gray-100" />
       <div className="absolute -right-2 top-[30px] w-4 h-4 bg-[#F5F5F5] rounded-full border-l border-gray-100" />
 
@@ -94,7 +94,7 @@ const RealQuickAddTicket = ({
       <Button
         variant={isInCart ? "outline" : "primary"}
         onClick={handleAdd}
-        className={`py-3.5 rounded-[16px] text-[13px] ${
+        className={`py-3.5 rounded-2xl text-[13px] ${
           isInCart ? "border-[#FF7600] text-[#FF7600]" : ""
         }`}
       >
@@ -168,7 +168,7 @@ export const CartClient = () => {
 
   if (items.length === 0) {
     return (
-      <div className="bg-white rounded-[24px] p-10 text-center shadow-sm max-w-2xl mx-auto mt-10 border border-gray-100">
+      <div className="bg-white rounded-3xl p-10 text-center shadow-sm max-w-2xl mx-auto mt-10 border border-gray-100">
         <p className="text-[#4B4B4B] font-bold text-lg mb-4">
           Ваша корзина пуста
         </p>
@@ -215,7 +215,7 @@ export const CartClient = () => {
               className="bg-white rounded-[20px] p-4 md:p-5 flex flex-row items-center justify-between shadow-sm border border-gray-100"
             >
               <div className="flex items-center gap-4 flex-1">
-                <div className="relative w-[80px] h-[80px] md:w-[96px] md:h-[96px] rounded-[16px] overflow-hidden shrink-0 bg-[#F58220]/20">
+                <div className="relative w-[80px] h-[80px] md:w-[96px] md:h-[96px] rounded-2xl overflow-hidden shrink-0 bg-[#F58220]/20">
                   <Image
                     src="/images/draw-tickets/big-block-bg.png"
                     alt={item.name}
@@ -251,7 +251,7 @@ export const CartClient = () => {
           <Link href="/" className="block w-full mt-2">
             <Button
               variant="outline"
-              className="w-full py-4 rounded-[16px] gap-2 border-gray-200"
+              className="w-full py-4 rounded-2xl gap-2 border-gray-200"
             >
               <Plus size={18} /> Добавить еще билет
             </Button>
@@ -259,7 +259,7 @@ export const CartClient = () => {
         </div>
 
         {/* ПРАВАЯ КОЛОНКА: Детали заказа (Десктоп) */}
-        <div className="hidden lg:flex w-[320px] flex-col bg-white rounded-[24px] p-6 shadow-sm border border-gray-100 shrink-0 sticky top-24">
+        <div className="hidden lg:flex w-[320px] flex-col bg-white rounded-3xl p-6 shadow-sm border border-gray-100 shrink-0 sticky top-24">
           <h3 className="text-[18px] font-bold text-[#4B4B4B] mb-5">
             Детали заказа
           </h3>
@@ -279,7 +279,7 @@ export const CartClient = () => {
         </div>
 
         {/* МОБИЛЬНАЯ ПАНЕЛЬ ОПЛАТЫ */}
-        <div className="lg:hidden fixed bottom-[90px] left-4 right-4 bg-white rounded-[24px] p-5 shadow-[0_-10px_40px_rgba(0,0,0,0.1)] z-40 border border-gray-100">
+        <div className="lg:hidden fixed bottom-[90px] left-4 right-4 bg-white rounded-3xl p-5 shadow-[0_-10px_40px_rgba(0,0,0,0.1)] z-40 border border-gray-100">
           <div className="flex items-center justify-between mb-4">
             <div className="flex flex-col">
               <span className="text-[13px] text-[#737373] font-medium mb-1">
@@ -299,7 +299,7 @@ export const CartClient = () => {
           <Button
             onClick={handleCheckout}
             isLoading={isPurchasing}
-            className="w-full bg-[#FF7600] hover:bg-[#E56A00] text-white py-4 rounded-[16px] text-[16px]"
+            className="w-full bg-[#FF7600] hover:bg-[#E56A00] text-white py-4 rounded-2xl text-[16px]"
           >
             Оплатить
           </Button>

@@ -74,7 +74,7 @@ export const TicketsHeroWidget = ({
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6 mt-6">
       {/* ЛЕВАЯ КОЛОНКА: БОЛЬШОЙ БАННЕР */}
-      <div className="lg:col-span-2 relative min-h-[260px] sm:min-h-[350px] lg:min-h-[420px] rounded-[24px] lg:rounded-[32px] overflow-hidden flex flex-col justify-between shadow-sm">
+      <div className="lg:col-span-2 relative min-h-[260px] sm:min-h-[350px] lg:min-h-[420px] rounded-3xl lg:rounded-4xl overflow-hidden flex flex-col justify-between shadow-sm">
         <Image
           src="/images/draw-tickets/big-block-bg.png"
           alt="Background"
@@ -129,7 +129,7 @@ export const TicketsHeroWidget = ({
       {/* ПРАВАЯ КОЛОНКА */}
       <div className="flex flex-col gap-4 lg:gap-6">
         {/* КАРТОЧКА ТИРАЖА */}
-        <div className="bg-white rounded-[24px] lg:rounded-[32px] p-6 lg:p-8 shadow-sm flex flex-col justify-center flex-1">
+        <div className="bg-white rounded-3xl lg:rounded-4xl p-6 lg:p-8 shadow-sm flex flex-col justify-center flex-1">
           <h2 className="text-[20px] lg:text-[26px] font-bold text-[#4B4B4B] text-center mb-6 lg:mb-8">
             {isLoading ? (
               <Skeleton className="h-8 w-3/4 mx-auto" />
@@ -175,7 +175,7 @@ export const TicketsHeroWidget = ({
         </div>
 
         {/* БЛОК ТАЙМЕРА */}
-        <div className="relative h-[130px] sm:h-[150px] lg:h-[180px] rounded-[24px] lg:rounded-[32px] overflow-hidden flex flex-col items-center justify-center shadow-sm">
+        <div className="relative h-[130px] sm:h-[150px] lg:h-[180px] rounded-3xl lg:rounded-4xl overflow-hidden flex flex-col items-center justify-center shadow-sm">
           <Image
             src="/images/draw-tickets/timer-block-bg.png"
             alt="Timer Background"
@@ -190,7 +190,7 @@ export const TicketsHeroWidget = ({
             </span>
 
             <div className="flex items-stretch justify-center gap-2 lg:gap-4 w-full">
-              <div className="flex flex-col bg-white/10 backdrop-blur-md border border-white/40 rounded-[12px] lg:rounded-[16px] p-2 lg:p-3 w-[70px] lg:w-[100px] items-center">
+              <div className="flex flex-col bg-white/10 backdrop-blur-md border border-white/40 rounded-[12px] lg:rounded-2xl p-2 lg:p-3 w-[70px] lg:w-[100px] items-center">
                 <span className="text-white text-[11px] lg:text-[14px] font-medium mb-1">
                   Дней
                 </span>
@@ -198,7 +198,7 @@ export const TicketsHeroWidget = ({
                   {isLoading ? "-" : timeLeft.days}
                 </span>
               </div>
-              <div className="flex flex-col bg-white/10 backdrop-blur-md border border-white/40 rounded-[12px] lg:rounded-[16px] p-2 lg:p-3 w-[140px] lg:w-[200px] items-center">
+              <div className="flex flex-col bg-white/10 backdrop-blur-md border border-white/40 rounded-[12px] lg:rounded-2xl p-2 lg:p-3 w-[140px] lg:w-[200px] items-center">
                 <span className="text-white text-[11px] lg:text-[14px] font-medium mb-1">
                   Часов
                 </span>

@@ -79,7 +79,7 @@ export const TopUpModal = ({ isOpen, onClose }: TopUpModalProps) => {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
               transition={{ duration: 0.2 }}
-              className="relative w-full max-w-md bg-[#F5F5F7] rounded-[24px] p-6 lg:p-10 shadow-2xl z-10"
+              className="relative w-full max-w-md bg-[#F5F5F7] rounded-3xl p-6 lg:p-10 shadow-2xl z-10"
             >
               <button
                 onClick={handleClose}
@@ -105,7 +105,7 @@ export const TopUpModal = ({ isOpen, onClose }: TopUpModalProps) => {
                   onChange={(e) => setAmount(e.target.value)}
                   placeholder="Например: 100"
                   min="1"
-                  className="w-full bg-white rounded-[16px] px-5 py-4 text-[16px] font-bold text-[#4B4B4B] outline-none border-2 border-transparent focus:border-[#FFD600] transition-all shadow-sm placeholder:text-gray-300"
+                  className="w-full bg-white rounded-2xl px-5 py-4 text-[16px] font-bold text-[#4B4B4B] outline-none border-2 border-transparent focus:border-[#FFD600] transition-all shadow-sm placeholder:text-gray-300"
                 />
               </div>
 

@@ -1,55 +1,50 @@
-import { Metadata } from "next";
-import { cookies } from "next/headers";
-import Link from "next/link";
-import { notFound } from "next/navigation";
+"use client";
 
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import Link from "next/link";
+import { useParams, useRouter } from "next/navigation";
+
+import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 
 import { OtherMaterialsSlider } from "@/widgets/OtherMaterialsSlider";
 
-import { getNewsData, getNewsDetail } from "@/entities/news/api";
+// 🔥 Импортируем наши новые хуки
+import { useNews, useNewsDetail } from "@/entities/news/api";
 
 import "./style.css";
 
-interface NewsDetailsPageProps {
-  params: Promise<{ slug: string }>;
-}
+export default function NewsDetailsPage() {
+  const params = useParams();
+  const slug = params.slug as string;
+  const router = useRouter();
 
-export async function generateMetadata({
-  params,
-}: NewsDetailsPageProps): Promise<Metadata> {
-  const { slug } = await params;
+  // 🔥 Запрашиваем данные через React Query
+  const { data: article, isLoading: isArticleLoading } = useNewsDetail(slug);
+  const { data: allNews = [], isLoading: isAllNewsLoading } = useNews();
 
-  const cookieStore = await cookies();
-  const locale = cookieStore.get("NEXT_LOCALE")?.value || "ru";
+  const isLoading = isArticleLoading || isAllNewsLoading;
 
-  const article = await getNewsDetail(slug, locale);
-
-  if (!article) {
-    return { title: "Новость не найдена | KGLOTO" };
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-[#F5F5F5] flex justify-center items-center pb-32">
+        <Loader2 className="w-10 h-10 animate-spin text-[#FF7600]" />
+      </div>
+    );
   }
 
-  return {
-    title: `${article.title} | KGLOTO`,
-    description: article.shortText || article.title,
-  };
-}
-
-export default async function NewsDetailsPage({
-  params,
-}: NewsDetailsPageProps) {
-  const { slug } = await params;
-
-  const cookieStore = await cookies();
-  const locale = cookieStore.get("NEXT_LOCALE")?.value || "ru";
-
-  const [article, allNews] = await Promise.all([
-    getNewsDetail(slug, locale),
-    getNewsData(locale),
-  ]);
-
   if (!article) {
-    return notFound();
+    return (
+      <div className="min-h-screen bg-[#F5F5F5] flex flex-col items-center justify-center pb-32">
+        <h1 className="text-2xl font-bold text-[#4B4B4B] mb-4">
+          Новость не найдена
+        </h1>
+        <button
+          onClick={() => router.back()}
+          className="text-[#FF7600] font-bold hover:underline"
+        >
+          Вернуться назад
+        </button>
+      </div>
+    );
   }
 
   // Фильтруем текущую новость из слайдера (проверяем и по ID, и по Slug)
@@ -70,16 +65,16 @@ export default async function NewsDetailsPage({
 
   return (
     <div className="min-h-screen bg-[#F5F5F5] font-rubik">
-      <main className="max-w-300 mx-auto px-4 lg:px-8 pt-6 lg:pt-10 pb-20 overflow-hidden">
+      <main className="max-w-250 mx-auto px-4 lg:px-8 pt-6 lg:pt-10 pb-20 overflow-hidden">
         {/* КНОПКА НАЗАД (Мобилка) */}
         <nav className="flex lg:hidden items-center mb-6">
-          <Link
-            href="/news"
+          <button
+            onClick={() => router.back()}
             className="flex items-center text-[#4B4B4B] active:scale-95 transition-transform"
           >
             <ChevronLeft size={28} className="mr-1 -ml-2" />
             <span className="text-[18px] font-bold">Назад</span>
-          </Link>
+          </button>
         </nav>
 
         {/* ХЛЕБНЫЕ КРОШКИ (ПК) */}
@@ -92,7 +87,9 @@ export default async function NewsDetailsPage({
             Новости
           </Link>
           <ChevronRight size={14} className="shrink-0" />
-          <span className="text-[#4B4B4B] truncate">{article.title}</span>
+          <span className="text-[#4B4B4B] truncate max-w-75">
+            {article.title}
+          </span>
         </nav>
 
         {/* ЗАГОЛОВОК И ДАТА */}
@@ -103,8 +100,8 @@ export default async function NewsDetailsPage({
           {formattedDate}
         </div>
 
-        {/* КОНТЕНТ НОВОСТИ (Используем твои классы .html-content) */}
-        <div className="w-full max-w-4xl bg-white rounded-4xl p-6 lg:p-10 shadow-sm border border-gray-100">
+        {/* КОНТЕНТ НОВОСТИ */}
+        <div className="w-full max-w-4xl bg-white rounded-3xl lg:rounded-4xl p-6 lg:p-10 shadow-sm border border-gray-100 mb-12">
           <div
             className="html-content text-[#4B4B4B]"
             dangerouslySetInnerHTML={{ __html: htmlContent }}
@@ -112,7 +109,9 @@ export default async function NewsDetailsPage({
         </div>
 
         {/* СЛАЙДЕР "ДРУГИЕ МАТЕРИАЛЫ" */}
-        <OtherMaterialsSlider articles={otherArticles} />
+        {otherArticles.length > 0 && (
+          <OtherMaterialsSlider articles={otherArticles} />
+        )}
       </main>
     </div>
   );

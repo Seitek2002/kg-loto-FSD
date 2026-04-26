@@ -60,7 +60,7 @@ export const LanguageClient = () => {
         </Link>
       </nav>
 
-      <div className="bg-white rounded-[24px] sm:rounded-[32px] p-4 sm:p-6 shadow-sm border border-gray-100">
+      <div className="bg-white rounded-3xl sm:rounded-4xl p-4 sm:p-6 shadow-sm border border-gray-100">
         <div className="flex flex-col gap-3">
           {LANGUAGES.map((lang) => {
             const isActive = activeLang === lang.id;

@@ -6,13 +6,16 @@ export interface MyTicketDto {
   ticketId: string;
   lotteryId: string;
   drawId: string;
+  name: string;
+  logo: string | null;
+  purchaseDateDisplay: string;
   ticketNumber: string;
   combination: number[];
-  price: number;
+  price: string;
   currency: string;
-  status: "sold" | "winning" | "losing"; // Бэк отдает sold для купленных
+  status: "sold" | "winning" | "losing";
   purchaseDate: string;
-  prizeAmount?: number; // На случай, если бэк отдает выигрыш для статуса winning
+  prizeAmount?: number | string;
 }
 
 export interface DrawDto {
@@ -75,6 +78,24 @@ export interface TicketsResponseData {
   tickets: TicketDto[];
 }
 
+export interface LotteryRuleDto {
+  id: number;
+  image: string;
+  text: string;
+  order: number;
+}
+
+export interface LotteryUiDto {
+  backgroundImage: string | null;
+  logo: string | null;
+  rules: LotteryRuleDto[];
+}
+
+export interface RawDrawDto extends Omit<DrawDto, "title"> {
+  winningCombination: number[] | null;
+  currency: string;
+}
+
 // --- API ОБЪЕКТ ---
 export const ticketApi = {
   // Получение доступных билетов
@@ -93,13 +114,13 @@ export const ticketApi = {
   },
 
   getCurrentDraw: async (lotteryId: string) => {
-    // Внимание на тип возвращаемых данных. У нас есть data и meta.
+    // 🔥 Теперь всё строго типизировано, никаких any!
     const response = await api.get<{
       success: boolean;
-      data: any[];
+      data: RawDrawDto[];
       meta: {
-        drawCards?: DrawDto[]; // Тот самый конвертированный в camelCase массив
-        lotteryUi?: any;
+        drawCards?: DrawDto[];
+        lotteryUi?: LotteryUiDto;
       };
     }>("/draws/current", {
       params: { lotteryId },
@@ -107,14 +128,16 @@ export const ticketApi = {
 
     const drawCards = response.data?.meta?.drawCards || [];
 
-    // Ищем открытый тираж среди богатых карточек
+    // Ищем открытый тираж среди карточек
     const openDraw = drawCards.find((draw) => draw.status === "open");
 
     return openDraw || null;
   },
 
   getMyTickets: async () => {
-    const { data } = await api.get<{ data: MyTicketDto[] }>("/me/balance/tickets/");
+    const { data } = await api.get<{ data: MyTicketDto[] }>(
+      "/me/balance/tickets/",
+    );
     return data.data;
   },
 };

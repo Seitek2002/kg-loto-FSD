@@ -88,7 +88,7 @@ export const WinnersListContent = () => {
 
   return (
     <div className="min-h-screen bg-[#F5F5F5] pb-24">
-      <div className="max-w-[1000px] mx-auto pt-6 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-250 mx-auto pt-6 px-4 sm:px-6 lg:px-8">
         {/* НАВИГАЦИЯ */}
         <nav className="flex items-center mb-6 lg:mb-10">
           <Link
