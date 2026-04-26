@@ -8,42 +8,55 @@ import { Loader2 } from "lucide-react";
 
 import { TopUpModal } from "@/features/top-up/ui/TopUpModal";
 
-import { useBalance, useWithdrawals } from "@/entities/finance/api";
+// 🔥 Импортируем обновленный хук
+import { useBalance, useTransactions } from "@/entities/finance/api";
 
 import { cn } from "@/shared/lib/utils";
 import { useAuthStore } from "@/shared/model/auth";
 import { Button } from "@/shared/ui/Button";
 
+// 🔥 Адаптировали статусы под ответ бэкенда ("Оплачено" и т.д.)
 const getStatusProps = (status: string) => {
-  switch (status) {
-    case "pending":
-      return { text: "Ожидает", classes: "bg-[#F3F4F6] text-[#4B4B4B]" };
-    case "processing":
-      return { text: "В обработке", classes: "bg-[#FFF0D4] text-[#F58220]" };
-    case "completed":
-      return { text: "Выполнено", classes: "bg-[#D1F5D3] text-[#1FAF38]" };
-    case "rejected":
-      return { text: "Отклонено", classes: "bg-[#FFD7D7] text-[#FF4B4B]" };
-    default:
-      return { text: status, classes: "bg-gray-100 text-[#737373]" };
+  const s = status.toLowerCase();
+  if (s.includes("оплачено") || s === "completed") {
+    return { text: status, classes: "bg-[#D1F5D3] text-[#1FAF38]" };
   }
+  if (s.includes("ожидает") || s === "pending") {
+    return { text: status, classes: "bg-[#F3F4F6] text-[#4B4B4B]" };
+  }
+  if (s.includes("отклонено") || s === "rejected") {
+    return { text: status, classes: "bg-[#FFD7D7] text-[#FF4B4B]" };
+  }
+  return { text: status, classes: "bg-[#FFF0D4] text-[#F58220]" };
 };
 
-const getMethodName = (method: string) =>
-  ({ mbank: "MBank", visa: "VISA", elcart: "Элкарт" })[method] || method;
-const formatDate = (dateString: string) =>
-  new Date(dateString).toLocaleDateString("ru-RU", {
+const getMethodName = (method: string) => {
+  // Оставляем красивое отображение, если знаем метод, иначе как с бэка
+  const knownMethods: Record<string, string> = {
+    mbank: "MBank",
+    visa: "VISA",
+    elcart: "Элкарт",
+    баланс: "С баланса",
+  };
+  return knownMethods[method.toLowerCase()] || method;
+};
+
+const formatDate = (dateString: string) => {
+  return new Date(dateString).toLocaleDateString("ru-RU", {
     day: "2-digit",
     month: "2-digit",
     year: "numeric",
   });
+};
 
 export default function WalletPage() {
   const user = useAuthStore((state) => state.user);
   const [isTopUpModalOpen, setIsTopUpModalOpen] = useState(false);
 
   useBalance();
-  const { data: transactions = [], isLoading } = useWithdrawals();
+
+  // 🔥 Используем новый хук
+  const { data: transactions = [], isLoading } = useTransactions();
 
   return (
     <div className="min-h-screen bg-[#F5F5F5] font-rubik pb-20">
@@ -76,13 +89,13 @@ export default function WalletPage() {
             <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
               <Button
                 onClick={() => setIsTopUpModalOpen(true)}
-                className="bg-[#F58220] text-white py-4 px-8 text-[14px] rounded-full"
+                className="bg-[#F58220] hover:bg-[#E56A00] text-white py-4 px-8 text-[14px] rounded-full"
               >
                 Пополнить
               </Button>
               <Button
                 variant="outline"
-                className="py-4 px-8 text-[14px] border-2 border-[#F58220] text-[#F58220] bg-transparent rounded-full"
+                className="py-4 px-8 text-[14px] border-2 border-[#F58220] text-[#F58220] bg-transparent rounded-full hover:bg-orange-50"
               >
                 Вывести
               </Button>
@@ -100,16 +113,19 @@ export default function WalletPage() {
             <Loader2 className="w-10 h-10 animate-spin text-[#F58220]" />
           </div>
         ) : transactions.length === 0 ? (
-          <div className="bg-white rounded-[24px] p-10 text-center text-gray-400 font-medium">
+          <div className="bg-white rounded-[24px] p-10 text-center text-gray-400 font-medium shadow-sm border border-gray-100">
             История операций пуста
           </div>
         ) : (
           <div className="flex flex-col gap-3">
-            {transactions.map((tx) => {
-              const status = getStatusProps(tx.status);
+            {transactions.map((tx, index) => {
+              const status = getStatusProps(tx.paymentStatus);
+              // Если нет уникального ID, используем дату + сумму + индекс как ключ
+              const uniqueKey = `${tx.date}-${tx.amount}-${index}`;
+
               return (
                 <div
-                  key={tx.id}
+                  key={uniqueKey}
                   className="bg-white rounded-[20px] p-4 shadow-sm border border-gray-100 flex flex-col gap-2"
                 >
                   <div className="flex justify-between items-center">
@@ -127,10 +143,10 @@ export default function WalletPage() {
                   </div>
                   <div className="flex justify-between items-center mt-1">
                     <span className="text-[#737373] font-medium text-[13px]">
-                      Способ: {getMethodName(tx.method)}
+                      Способ: {getMethodName(tx.paymentMethod)}
                     </span>
                     <span className="text-[#737373] text-[13px] font-medium">
-                      {formatDate(tx.createdAt)}
+                      {formatDate(tx.date)}
                     </span>
                   </div>
                 </div>

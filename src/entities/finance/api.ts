@@ -16,17 +16,33 @@ interface PaylinkResponse {
   };
 }
 
-// 🔥 Реальные запросы к API
+// 🔥 ИНТЕРФЕЙСЫ ДЛЯ ТРАНЗАКЦИЙ
+export interface TransactionDto {
+  date: string;
+  amount: string;
+  currency: string;
+  paymentMethod: string;
+  paymentStatus: string;
+}
+
+export interface TransactionsResponse {
+  data: {
+    page: number;
+    limit: number;
+    total: number;
+    items: TransactionDto[];
+  };
+}
+
 export const financeApi = {
   // 1. Получение баланса
   getBalance: async () => {
     const { data } = await api.get<BalanceResponse>("/profile/balance");
-    return data.data; // Возвращает { amount: "7", currency: "KGS" }
+    return data.data;
   },
 
   // 2. Создание ссылки на оплату
   createPaylink: async (amount: string) => {
-    // 🔥 Явно формируем строку, чтобы избежать проблем с сериализацией в apiClient
     const bodyString = `amount=${encodeURIComponent(amount)}`;
 
     const { data } = await api.post<PaylinkResponse>(
@@ -39,16 +55,19 @@ export const financeApi = {
       },
     );
 
-    return data.data; // Возвращает { paylinkUrl: "https://..." }
+    return data.data;
   },
 
-  // 3. История выводов (пока оставляем заглушку, если апи для истории еще нет)
-  getWithdrawals: async () => {
-    return [];
+  // 3. История транзакций
+  getTransactions: async () => {
+    const { data } = await api.get<TransactionsResponse>(
+      "/me/balance/transactions/",
+    );
+    return data.data.items; // Возвращаем массив items
   },
 };
 
-// 🔥 Хук для баланса (Синхронизирует сервер с Zustand)
+// Хук для баланса
 export const useBalance = () => {
   const token = useAuthStore((state) => state.accessToken);
   const updateUser = useAuthStore((state) => state.updateUser);
@@ -57,30 +76,25 @@ export const useBalance = () => {
     queryKey: ["balance"],
     queryFn: async () => {
       const data = await financeApi.getBalance();
-
-      // Синхронизируем баланс с Zustand, чтобы он обновился в шапке и кошельке.
-      // Бэкенд отдает строку (например, "7"), мы можем хранить ее как есть.
-      updateUser({ balance: data.amount });
+      updateUser({ balance: Number(data.amount) });
 
       return data;
     },
-    // Запрашиваем только если есть токен (юзер авторизован)
     enabled: !!token,
-    // Обновляем раз в 30 секунд (полезно для WebView)
     refetchInterval: 30000,
   });
 };
 
-// 🔥 Хук для пополнения
 export const useTopUp = () => {
   return useMutation({
     mutationFn: financeApi.createPaylink,
   });
 };
 
-export const useWithdrawals = () => {
+// 🔥 Изменили название хука на более правильное
+export const useTransactions = () => {
   return useQuery({
-    queryKey: ["withdrawals"],
-    queryFn: financeApi.getWithdrawals,
+    queryKey: ["transactions"],
+    queryFn: financeApi.getTransactions,
   });
 };
