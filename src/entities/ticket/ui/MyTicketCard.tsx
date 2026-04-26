@@ -4,6 +4,7 @@ import Image from "next/image";
 
 import { cn } from "@/shared/lib/utils";
 import { Button } from "@/shared/ui/Button";
+import { NumberedBall } from "@/shared/ui/NumberedBall";
 
 export interface MyTicketCardProps {
   prizeAmount: string;
@@ -15,7 +16,7 @@ export interface MyTicketCardProps {
   badge?: { text: string; variant: "success" | "waiting" | "processing" };
   showButton?: boolean;
   drawNumber?: string;
-  combination?: number[]; // 🔥 Добавили пропс для комбинации
+  combination?: number[];
   onAction?: () => void;
 }
 
@@ -29,7 +30,7 @@ export const MyTicketCard = ({
   badge,
   showButton = true,
   drawNumber,
-  combination, // 🔥 Достаем из пропсов
+  combination,
   onAction,
 }: MyTicketCardProps) => {
   const cleanAmount = prizeAmount.replace(/\s/g, "");
@@ -113,16 +114,16 @@ export const MyTicketCard = ({
         </div>
       </div>
 
-      {/* 🔥 ОТРИСОВКА ВЫБРАННОЙ КОМБИНАЦИИ (Зеленые шарики) */}
+      {/* 🔥 ОТРИСОВКА ВЫБРАННОЙ КОМБИНАЦИИ (через компонент NumberedBall) */}
       {combination && combination.length > 0 && (
         <div className="flex flex-wrap gap-2 mb-5">
           {combination.map((num, idx) => (
-            <div
+            <NumberedBall
               key={idx}
-              className="w-10 h-10 rounded-full bg-[#00C814] text-white flex items-center justify-center font-bold text-[16px] shadow-sm"
-            >
-              {num}
-            </div>
+              number={num}
+              size={40} // Размер подгоняем под твои 40px (w-10 h-10)
+              className="shadow-sm"
+            />
           ))}
         </div>
       )}

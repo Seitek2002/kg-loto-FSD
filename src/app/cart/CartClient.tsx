@@ -9,7 +9,8 @@ import { useRouter } from "next/navigation";
 import { useMounted } from "@/hooks/useMounted";
 import { Loader2, Plus, Trash2 } from "lucide-react";
 
-import { useCartStore } from "@/entities/cart/model";
+// 🔥 Добавили импорт типа CartItem
+import { type CartItem, useCartStore } from "@/entities/cart/model";
 import { useBalance } from "@/entities/finance/api";
 import {
   type TicketDto,
@@ -31,7 +32,7 @@ const getTicketPlural = (count: number) => {
   return "билетов";
 };
 
-// 🔥 Реальный компонент для левой колонки (Быстрое добавление)
+// Реальный компонент для левой колонки (Быстрое добавление)
 const RealQuickAddTicket = ({
   ticket,
   lotteryId,
@@ -61,8 +62,8 @@ const RealQuickAddTicket = ({
 
   return (
     <div className="bg-white rounded-3xl p-5 shadow-sm border border-gray-100 flex flex-col relative mb-4">
-      <div className="absolute -left-2 top-[30px] w-4 h-4 bg-[#F5F5F5] rounded-full border-r border-gray-100" />
-      <div className="absolute -right-2 top-[30px] w-4 h-4 bg-[#F5F5F5] rounded-full border-l border-gray-100" />
+      <div className="absolute -left-2 top-7.5 w-4 h-4 bg-[#F5F5F5] rounded-full border-r border-gray-100" />
+      <div className="absolute -right-2 top-7.5 w-4 h-4 bg-[#F5F5F5] rounded-full border-l border-gray-100" />
 
       <div className="flex justify-between items-center border-b border-dashed border-gray-300 pb-4 mb-4">
         <span className="text-[#737373] font-medium text-sm">
@@ -131,7 +132,8 @@ export const CartClient = () => {
     ticketsData?.tickets?.filter((t) => t.status === "available") || [];
   const quickAddTickets = availableTickets.slice(0, 2);
 
-  const removeItem = (item: any) => toggleItem(item);
+  // 🔥 Заменили any на CartItem
+  const removeItem = (item: CartItem) => toggleItem(item);
 
   const totalPrice = items.reduce((acc, item) => acc + item.price, 0);
   const totalTickets = items.length;
@@ -215,7 +217,7 @@ export const CartClient = () => {
               className="bg-white rounded-[20px] p-4 md:p-5 flex flex-row items-center justify-between shadow-sm border border-gray-100"
             >
               <div className="flex items-center gap-4 flex-1">
-                <div className="relative w-[80px] h-[80px] md:w-[96px] md:h-[96px] rounded-2xl overflow-hidden shrink-0 bg-[#F58220]/20">
+                <div className="relative w-20 h-20 md:w-24 md:h-24 rounded-2xl overflow-hidden shrink-0 bg-[#F58220]/20">
                   <Image
                     src="/images/draw-tickets/big-block-bg.png"
                     alt={item.name}
@@ -242,7 +244,7 @@ export const CartClient = () => {
 
               <button
                 onClick={() => removeItem(item)}
-                className="w-[44px] h-[44px] border border-gray-200 rounded-full flex items-center justify-center text-[#A3A3A3] hover:bg-gray-50 hover:text-[#DC2626] transition-colors active:scale-95 shrink-0 ml-2"
+                className="w-11 h-11 border border-gray-200 rounded-full flex items-center justify-center text-[#A3A3A3] hover:bg-gray-50 hover:text-[#DC2626] transition-colors active:scale-95 shrink-0 ml-2"
               >
                 <Trash2 className="w-5 h-5" />
               </button>
@@ -279,7 +281,7 @@ export const CartClient = () => {
         </div>
 
         {/* МОБИЛЬНАЯ ПАНЕЛЬ ОПЛАТЫ */}
-        <div className="lg:hidden fixed bottom-[90px] left-4 right-4 bg-white rounded-3xl p-5 shadow-[0_-10px_40px_rgba(0,0,0,0.1)] z-40 border border-gray-100">
+        <div className="lg:hidden fixed bottom-22.5 left-4 right-4 bg-white rounded-3xl p-5 shadow-[0_-10px_40px_rgba(0,0,0,0.1)] z-40 border border-gray-100">
           <div className="flex items-center justify-between mb-4">
             <div className="flex flex-col">
               <span className="text-[13px] text-[#737373] font-medium mb-1">
