@@ -74,7 +74,7 @@ export const TicketsHeroWidget = ({
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6 mt-6">
       {/* ЛЕВАЯ КОЛОНКА: БОЛЬШОЙ БАННЕР */}
-      <div className="lg:col-span-2 relative min-h-[260px] sm:min-h-[350px] lg:min-h-[420px] rounded-3xl lg:rounded-4xl overflow-hidden flex flex-col justify-between shadow-sm">
+      <div className="lg:col-span-2 relative min-h-65 sm:min-h-87.5 lg:min-h-105 rounded-3xl lg:rounded-4xl overflow-hidden flex flex-col justify-between shadow-sm">
         <Image
           src="/images/draw-tickets/big-block-bg.png"
           alt="Background"
@@ -85,7 +85,7 @@ export const TicketsHeroWidget = ({
         />
 
         <div className="relative z-10 flex flex-col items-center self-start pt-6 sm:pt-10 lg:pt-16 pl-4 sm:pl-8 lg:pl-16">
-          <div className="relative w-[200px] h-[75px] sm:w-[280px] sm:h-[100px] lg:w-[400px] lg:h-[140px] mb-2 sm:mb-4">
+          <div className="relative w-50 h-18.75 sm:w-70 sm:h-25 lg:w-100 lg:h-35 mb-2 sm:mb-4">
             <Image
               src="/images/draw-tickets/super-jackpot-logo.png"
               alt="Супер Джекпот"
@@ -100,7 +100,7 @@ export const TicketsHeroWidget = ({
           </div>
           <div className="text-[#E2FF5A] text-[32px] sm:text-4xl lg:text-[64px] leading-none font-black font-benzin drop-shadow-[0_4px_10px_rgba(0,0,0,0.3)]">
             {isLoading ? (
-              <Skeleton className="w-[200px] h-[40px] lg:h-[70px] bg-white/20 mt-2" />
+              <Skeleton className="w-50 h-10 lg:h-17.5 bg-white/20 mt-2" />
             ) : (
               currentDraw?.jackpotAmountDisplay || "0 с"
             )}
@@ -181,7 +181,7 @@ export const TicketsHeroWidget = ({
         </div>
 
         {/* БЛОК ТАЙМЕРА */}
-        <div className="relative h-[130px] sm:h-[150px] lg:h-[180px] rounded-3xl lg:rounded-4xl overflow-hidden flex flex-col items-center justify-center shadow-sm">
+        <div className="relative h-32.5 sm:h-37.5 lg:h-45 rounded-3xl lg:rounded-4xl overflow-hidden flex flex-col items-center justify-center shadow-sm">
           <Image
             src="/images/draw-tickets/timer-block-bg.png"
             alt="Timer Background"
@@ -196,7 +196,7 @@ export const TicketsHeroWidget = ({
             </span>
 
             <div className="flex items-stretch justify-center gap-2 lg:gap-4 w-full">
-              <div className="flex flex-col bg-white/10 backdrop-blur-md border border-white/40 rounded-xl lg:rounded-2xl p-2 lg:p-3 w-[70px] lg:w-[100px] items-center">
+              <div className="flex flex-col bg-white/10 backdrop-blur-md border border-white/40 rounded-xl lg:rounded-2xl p-2 lg:p-3 w-17.5 lg:w-25 items-center">
                 <span className="text-white text-[11px] lg:text-[14px] font-medium mb-1">
                   Дней
                 </span>
@@ -204,7 +204,7 @@ export const TicketsHeroWidget = ({
                   {isLoading ? "-" : timeLeft.days}
                 </span>
               </div>
-              <div className="flex flex-col bg-white/10 backdrop-blur-md border border-white/40 rounded-xl lg:rounded-2xl p-2 lg:p-3 w-[140px] lg:w-[200px] items-center">
+              <div className="flex flex-col bg-white/10 backdrop-blur-md border border-white/40 rounded-xl lg:rounded-2xl p-2 lg:p-3 w-35 lg:w-50 items-center">
                 <span className="text-white text-[11px] lg:text-[14px] font-medium mb-1">
                   Часов
                 </span>
