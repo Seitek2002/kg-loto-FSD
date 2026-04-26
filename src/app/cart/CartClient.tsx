@@ -18,6 +18,7 @@ import {
   useTickets,
 } from "@/entities/ticket/api";
 
+import { cn } from "@/shared/lib/utils";
 import { Button } from "@/shared/ui/Button";
 import { ErrorModal } from "@/shared/ui/ErrorModal";
 import { NumberedBall } from "@/shared/ui/NumberedBall";
@@ -93,11 +94,13 @@ const RealQuickAddTicket = ({
       </div>
 
       <Button
-        variant={isInCart ? "outline" : "primary"}
         onClick={handleAdd}
-        className={`py-3.5 rounded-2xl text-[13px] ${
-          isInCart ? "border-[#FF7600] text-[#FF7600]" : ""
-        }`}
+        className={cn(
+          "w-full py-3.5 rounded-2xl text-[13px] shadow-sm",
+          isInCart
+            ? "bg-[#4B4B4B] text-white hover:bg-gray-800"
+            : "bg-[#FF7600] text-white hover:bg-[#E56A00]",
+        )}
       >
         {isInCart ? "Убрать из корзины" : `Добавить • ${ticket.price} с`}
       </Button>
