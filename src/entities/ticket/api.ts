@@ -16,6 +16,8 @@ export interface MyTicketDto {
   status: "sold" | "winning" | "losing";
   purchaseDate: string;
   prizeAmount?: number | string;
+  drawDate?: string;
+  drawDateDisplay?: string;
 }
 
 export interface DrawDto {

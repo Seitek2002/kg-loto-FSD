@@ -6,24 +6,26 @@ import "swiper/css";
 import { Swiper, SwiperSlide } from "swiper/react";
 
 import { useWinners } from "@/entities/winner/api";
+import { Winner } from "@/entities/winner/types";
 import { WinnerCard } from "@/entities/winner/ui/WinnerCard";
 
 import { Button } from "@/shared/ui/Button";
 import { Description } from "@/shared/ui/Description";
 import { Skeleton } from "@/shared/ui/Skeleton";
 import { Title } from "@/shared/ui/Title";
-import { Winner } from "@/entities/winner/types";
 
 interface WinnersHistoryProps {
   title?: string;
   description?: string;
+  lotteryId?: string;
 }
 
 export const WinnersHistoryWidget = ({
   title,
   description,
+  lotteryId,
 }: WinnersHistoryProps) => {
-  const { data: winners, isLoading } = useWinners();
+  const { data: winners, isLoading } = useWinners(lotteryId);
 
   if (isLoading) {
     return (

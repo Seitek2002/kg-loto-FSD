@@ -18,6 +18,7 @@ export interface MyTicketCardProps {
   drawNumber?: string;
   combination?: number[];
   onAction?: () => void;
+  drawDateDisplay?: string;
 }
 
 export const MyTicketCard = ({
@@ -32,6 +33,7 @@ export const MyTicketCard = ({
   drawNumber,
   combination,
   onAction,
+  drawDateDisplay
 }: MyTicketCardProps) => {
   const cleanAmount = prizeAmount.replace(/\s/g, "");
   const isNumeric = !isNaN(Number(cleanAmount)) && cleanAmount !== "";
@@ -101,6 +103,7 @@ export const MyTicketCard = ({
             {drawNumber && <span>Тираж №{drawNumber}</span>}
             <span>Стоимость: {price}</span>
             <span>Дата покупки: {date}</span>
+            {drawDateDisplay && <span className="text-[#4B4B4B]">Дата розыгрыша: {drawDateDisplay}</span>}
           </div>
         </div>
         <div className="relative w-22.5 h-8.75 shrink-0 mt-1">

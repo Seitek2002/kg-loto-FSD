@@ -82,7 +82,8 @@ export const TicketsClient = () => {
                 status={uiStatus}
                 showButton={uiStatus !== "losing"}
                 drawNumber={drawNumberStr}
-                combination={ticket.combination} // 🔥 Прокидываем комбинацию
+                combination={ticket.combination}
+                drawDateDisplay={ticket.drawDateDisplay}
               />
             );
           })}
