@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
 export interface CartItem {
   id: string; // Это ticketId
@@ -8,7 +9,7 @@ export interface CartItem {
   combination: number[];
   lotteryId: string;
   drawId: string;
-  name: string; // Название лотереи
+  name: string;
 }
 
 interface CartStore {
@@ -17,17 +18,24 @@ interface CartStore {
   clearCart: () => void;
 }
 
-export const useCartStore = create<CartStore>((set) => ({
-  items: [],
+export const useCartStore = create<CartStore>()(
+  persist(
+    (set) => ({
+      items: [],
 
-  toggleItem: (item) =>
-    set((state) => {
-      const exists = state.items.find((i) => i.id === item.id);
-      if (exists) {
-        return { items: state.items.filter((i) => i.id !== item.id) };
-      }
-      return { items: [...state.items, item] };
+      toggleItem: (item) =>
+        set((state) => {
+          const exists = state.items.find((i) => i.id === item.id);
+          if (exists) {
+            return { items: state.items.filter((i) => i.id !== item.id) };
+          }
+          return { items: [...state.items, item] };
+        }),
+
+      clearCart: () => set({ items: [] }),
     }),
-
-  clearCart: () => set({ items: [] }),
-}));
+    {
+      name: "cart-storage",
+    },
+  ),
+);

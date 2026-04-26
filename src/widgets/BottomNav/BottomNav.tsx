@@ -5,8 +5,10 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 
-// 🔥 Убрали Trophy, добавили ShoppingCart
+import { useMounted } from "@/hooks/useMounted";
 import { ShoppingCart, Star, Ticket, User } from "lucide-react";
+
+import { useCartStore } from "@/entities/cart/model";
 
 import { cn } from "@/shared/lib/utils";
 
@@ -15,7 +17,6 @@ import { cn } from "@/shared/lib/utils";
 const navItems = [
   { label: "Лотереи", href: "/", icon: Star, protected: false },
   { label: "Билеты", href: "/tickets", icon: Ticket, protected: true },
-  // 🔥 Заменили Призы на Корзину
   { label: "Корзина", href: "/cart", icon: ShoppingCart, protected: false },
   { label: "Профиль", href: "/profile", icon: User, protected: true },
 ];
@@ -23,8 +24,12 @@ const navItems = [
 export function BottomNav() {
   const pathname = usePathname();
   const router = useRouter();
+  const mounted = useMounted();
+
+  const cartItemsCount = useCartStore((state) => state.items.length);
+
   // const { isAuth } = useAuthStore();
-  const isAuth = true; // Заглушка
+  const isAuth = true;
 
   const [isIOS, setIsIOS] = useState(false);
 
@@ -74,12 +79,21 @@ export function BottomNav() {
                   : "text-[#5B5B5B] bg-transparent hover:bg-gray-50",
               )}
             >
-              <item.icon
-                size={22}
-                fill={isActive ? "currentColor" : "none"}
-                strokeWidth={isActive ? 2 : 2.5}
-                className="shrink-0 mb-1"
-              />
+              <div className="relative mb-1">
+                <item.icon
+                  size={22}
+                  fill={isActive ? "currentColor" : "none"}
+                  strokeWidth={isActive ? 2 : 2.5}
+                  className="shrink-0"
+                />
+
+                {mounted && item.href === "/cart" && cartItemsCount > 0 && (
+                  <div className="absolute top-0 -right-2 bg-[#FF7600] text-white text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full shadow-sm border-[1.5px] border-white">
+                    {cartItemsCount > 99 ? "99+" : cartItemsCount}
+                  </div>
+                )}
+              </div>
+
               <span className="text-[11px] font-bold font-rubik leading-none">
                 {item.label}
               </span>

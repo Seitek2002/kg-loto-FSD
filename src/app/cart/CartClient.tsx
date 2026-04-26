@@ -44,14 +44,14 @@ const RealQuickAddTicket = ({
   const { toggleItem, items } = useCartStore();
   const numbers = Array.from({ length: 36 }, (_, i) => i + 1);
 
-  const isInCart = items.some((i) => i.id === ticket.ticket_id);
+  const isInCart = items.some((i) => i.id === ticket.ticketId);
 
   const handleAdd = () => {
     toggleItem({
-      id: ticket.ticket_id,
+      id: ticket.ticketId,
       price: ticket.price,
       type: "other",
-      ticketNumber: ticket.ticket_number,
+      ticketNumber: ticket.ticketNumber,
       combination: ticket.combination,
       lotteryId: lotteryId,
       drawId: drawId,
@@ -66,7 +66,7 @@ const RealQuickAddTicket = ({
 
       <div className="flex justify-between items-center border-b border-dashed border-gray-300 pb-4 mb-4">
         <span className="text-[#737373] font-medium text-sm">
-          Билет №{ticket.ticket_number}
+          Билет №{ticket.ticketNumber}
         </span>
         <span className="font-bold text-[#4B4B4B] text-[16px]">
           {ticket.price} <span className="underline">с</span>
@@ -179,6 +179,8 @@ export const CartClient = () => {
     );
   }
 
+  console.log(items);
+
   return (
     <>
       <div className="flex flex-col lg:flex-row gap-6 items-start">
@@ -194,7 +196,7 @@ export const CartClient = () => {
           ) : quickAddTickets.length > 0 ? (
             quickAddTickets.map((ticket) => (
               <RealQuickAddTicket
-                key={ticket.ticket_id}
+                key={ticket.ticketId}
                 ticket={ticket}
                 lotteryId={ticketsData!.lottery_id}
                 drawId={ticketsData!.draw_id}
