@@ -30,7 +30,7 @@ export const DrawTicketCard = ({
       <div className="absolute -left-2 top-7.5 w-4 h-4 bg-[#F5F5F5] rounded-full border-r border-gray-100" />
       <div className="absolute -right-2 top-7.5 w-4 h-4 bg-[#F5F5F5] rounded-full border-l border-gray-100" />
 
-      <div className="flex justify-between items-center border-b border-dashed border-gray-300 pb-4 mb-4">
+      <div className="flex justify-between font-benzin items-center border-b border-dashed border-gray-300 pb-4 mb-4">
         <span className="text-[#737373] font-medium text-sm">
           Билет №{ticketNumber}
         </span>

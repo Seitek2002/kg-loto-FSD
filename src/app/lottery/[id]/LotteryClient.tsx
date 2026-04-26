@@ -28,9 +28,9 @@ export const LotteryClient = ({ lotteryId }: LotteryClientProps) => {
       {activeTab === "tickets" && (
         <div className="mt-12 lg:mt-16">
           <div className="mb-12">
-            <WinnersHistoryWidget />
+            <DrawTicketsBlock lotteryId={lotteryId} />
           </div>
-          <DrawTicketsBlock lotteryId={lotteryId} />
+          <WinnersHistoryWidget />
         </div>
       )}
 

@@ -71,7 +71,7 @@ export const DrawTicketsBlock = ({ lotteryId }: { lotteryId: string }) => {
           </p>
         </div>
       ) : (
-        availableTickets.map((ticket, i) => {
+        availableTickets.map((ticket) => {
           // Ищем, есть ли билет в корзине
           const isInBasket = basketIds.includes(ticket.ticketId);
 
