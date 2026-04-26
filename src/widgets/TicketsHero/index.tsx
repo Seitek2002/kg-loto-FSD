@@ -127,7 +127,13 @@ export const TicketsHeroWidget = ({
       </div>
 
       {/* ПРАВАЯ КОЛОНКА */}
-      <div className="flex flex-col gap-4 lg:gap-6">
+      <div
+        className={cn(
+          "flex-col gap-4 lg:gap-6",
+          // 🔥 Показываем на мобилке только если таб 'tickets', на ПК (lg) показываем всегда
+          activeTab === "tickets" ? "flex" : "hidden lg:flex",
+        )}
+      >
         {/* КАРТОЧКА ТИРАЖА */}
         <div className="bg-white rounded-3xl lg:rounded-4xl p-6 lg:p-8 shadow-sm flex flex-col justify-center flex-1">
           <h2 className="text-[20px] lg:text-[26px] font-bold text-[#4B4B4B] text-center mb-6 lg:mb-8">
@@ -190,7 +196,7 @@ export const TicketsHeroWidget = ({
             </span>
 
             <div className="flex items-stretch justify-center gap-2 lg:gap-4 w-full">
-              <div className="flex flex-col bg-white/10 backdrop-blur-md border border-white/40 rounded-[12px] lg:rounded-2xl p-2 lg:p-3 w-[70px] lg:w-[100px] items-center">
+              <div className="flex flex-col bg-white/10 backdrop-blur-md border border-white/40 rounded-xl lg:rounded-2xl p-2 lg:p-3 w-[70px] lg:w-[100px] items-center">
                 <span className="text-white text-[11px] lg:text-[14px] font-medium mb-1">
                   Дней
                 </span>
@@ -198,7 +204,7 @@ export const TicketsHeroWidget = ({
                   {isLoading ? "-" : timeLeft.days}
                 </span>
               </div>
-              <div className="flex flex-col bg-white/10 backdrop-blur-md border border-white/40 rounded-[12px] lg:rounded-2xl p-2 lg:p-3 w-[140px] lg:w-[200px] items-center">
+              <div className="flex flex-col bg-white/10 backdrop-blur-md border border-white/40 rounded-xl lg:rounded-2xl p-2 lg:p-3 w-[140px] lg:w-[200px] items-center">
                 <span className="text-white text-[11px] lg:text-[14px] font-medium mb-1">
                   Часов
                 </span>

@@ -5,8 +5,6 @@ import { HeroWidget } from "@/widgets/Hero";
 
 import api from "@/shared/api/apiClient";
 
-// Проверь путь к твоему apiClient
-
 export const metadata = {
   title: "KGLOTO | Главная",
   description: "Покупайте билеты и выигрывайте призы!",
