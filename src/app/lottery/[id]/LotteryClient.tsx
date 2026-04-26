@@ -30,7 +30,7 @@ export const LotteryClient = ({ lotteryId }: LotteryClientProps) => {
           <div className="mb-12">
             <DrawTicketsBlock lotteryId={lotteryId} />
           </div>
-          <WinnersHistoryWidget description=" " />
+          <WinnersHistoryWidget description=" " lotteryId={lotteryId} />
         </div>
       )}
 
@@ -38,7 +38,7 @@ export const LotteryClient = ({ lotteryId }: LotteryClientProps) => {
         <div className="mt-12 lg:mt-16 text-center text-gray-500 py-10">
           <DrawRulesBlock />
           <div className="mt-16 lg:mt-24 text-left">
-            <WinnersHistoryWidget description=" " />
+            <WinnersHistoryWidget description=" " lotteryId={lotteryId} />
           </div>
           {/* <LotteryConditions terms={MOCK_TERMS} />  */}
           <PopularTicketsWidget ///tickets {drawId} {lotteryId}
