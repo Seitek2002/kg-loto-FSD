@@ -12,6 +12,7 @@ import { Button } from "@/shared/ui/Button";
 import { Description } from "@/shared/ui/Description";
 import { Skeleton } from "@/shared/ui/Skeleton";
 import { Title } from "@/shared/ui/Title";
+import { Winner } from "@/entities/winner/types";
 
 interface WinnersHistoryProps {
   title?: string;
@@ -69,7 +70,7 @@ export const WinnersHistoryWidget = ({
         }}
         className="overflow-visible!"
       >
-        {displayWinners.map((winner) => (
+        {displayWinners.map((winner: Winner) => (
           <SwiperSlide key={winner.id}>
             <WinnerCard winner={winner} />
           </SwiperSlide>
