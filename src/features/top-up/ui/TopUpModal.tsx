@@ -16,7 +16,6 @@ import { ErrorModal } from "@/shared/ui/ErrorModal";
 interface TopUpModalProps {
   isOpen: boolean;
   onClose: () => void;
-  // 🔥 Новые пропсы для кастомизации
   title?: ReactNode;
   description?: ReactNode;
   initialAmount?: number | string;
@@ -33,14 +32,19 @@ export const TopUpModal = ({
   const [amount, setAmount] = useState("");
   const [isErrorOpen, setIsErrorOpen] = useState(false);
 
-  const { mutate: createPaylink, isPending } = useTopUp();
+  // 🔥 Создаем стейт для отслеживания предыдущего значения isOpen
+  const [prevIsOpen, setPrevIsOpen] = useState(isOpen);
 
-  // 🔥 Подставляем начальную сумму при открытии модалки
-  useEffect(() => {
+  // 🔥 Best Practice от React: обновляем стейт прямо во время рендера,
+  // избегая каскадных обновлений через useEffect
+  if (isOpen !== prevIsOpen) {
+    setPrevIsOpen(isOpen);
     if (isOpen) {
       setAmount(initialAmount ? String(initialAmount) : "");
     }
-  }, [isOpen, initialAmount]);
+  }
+
+  const { mutate: createPaylink, isPending } = useTopUp();
 
   useEffect(() => {
     if (isOpen && !isErrorOpen) document.body.style.overflow = "hidden";
