@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 
 import Image from "next/image";
 
@@ -11,25 +11,38 @@ import { X } from "lucide-react";
 import { useTopUp } from "@/entities/finance/api";
 
 import { Button } from "@/shared/ui/Button";
-// 🔥 Подключаем модалку ошибки
 import { ErrorModal } from "@/shared/ui/ErrorModal";
 
 interface TopUpModalProps {
   isOpen: boolean;
   onClose: () => void;
+  // 🔥 Новые пропсы для кастомизации
+  title?: ReactNode;
+  description?: ReactNode;
+  initialAmount?: number | string;
 }
 
-export const TopUpModal = ({ isOpen, onClose }: TopUpModalProps) => {
+export const TopUpModal = ({
+  isOpen,
+  onClose,
+  title,
+  description,
+  initialAmount,
+}: TopUpModalProps) => {
   const mounted = useMounted();
   const [amount, setAmount] = useState("");
-
-  // 🔥 Стейт для показа ошибки
   const [isErrorOpen, setIsErrorOpen] = useState(false);
 
   const { mutate: createPaylink, isPending } = useTopUp();
 
+  // 🔥 Подставляем начальную сумму при открытии модалки
   useEffect(() => {
-    // Не блочим скролл, если открыта модалка ошибки (она сама заблокирует)
+    if (isOpen) {
+      setAmount(initialAmount ? String(initialAmount) : "");
+    }
+  }, [isOpen, initialAmount]);
+
+  useEffect(() => {
     if (isOpen && !isErrorOpen) document.body.style.overflow = "hidden";
     else if (!isOpen && !isErrorOpen) document.body.style.overflow = "unset";
   }, [isOpen, isErrorOpen]);
@@ -53,7 +66,6 @@ export const TopUpModal = ({ isOpen, onClose }: TopUpModalProps) => {
       },
       onError: (error) => {
         console.error("Ошибка пополнения:", error);
-        // 🔥 Открываем модалку ошибки, если бэкенд вернул 400/500
         setIsErrorOpen(true);
       },
     });
@@ -65,7 +77,7 @@ export const TopUpModal = ({ isOpen, onClose }: TopUpModalProps) => {
     <>
       <AnimatePresence>
         {isOpen && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <div className="fixed inset-0 z-100 flex items-center justify-center p-4">
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -88,12 +100,16 @@ export const TopUpModal = ({ isOpen, onClose }: TopUpModalProps) => {
                 <X size={24} strokeWidth={2} />
               </button>
 
-              <h2 className="text-[20px] lg:text-[24px] font-black text-[#4B4B4B] uppercase text-center leading-tight mb-2">
-                Пополнение баланса
+              {/* 🔥 Кастомный заголовок (если есть) или дефолтный */}
+              <h2 className="text-[20px] lg:text-[24px] font-black text-[#4B4B4B] uppercase leading-tight mb-2">
+                {title || "Пополнение баланса"}
               </h2>
-              <p className="text-[#8C8C8C] text-[11px] lg:text-[12px] text-center mb-6 lg:mb-8 font-medium">
-                Деньги поступят на счет моментально после оплаты
-              </p>
+
+              {/* 🔥 Кастомное описание (если есть) или дефолтное */}
+              <div className="text-[#8C8C8C] text-[11px] lg:text-[13px] mb-6 lg:mb-8 font-medium leading-relaxed">
+                {description ||
+                  "Деньги поступят на счет моментально после оплаты"}
+              </div>
 
               <div className="flex flex-col gap-2 mb-6">
                 <label className="text-[13px] font-bold text-[#4B4B4B] ml-1">
@@ -157,7 +173,6 @@ export const TopUpModal = ({ isOpen, onClose }: TopUpModalProps) => {
         )}
       </AnimatePresence>
 
-      {/* 🔥 Выводим модалку ошибки */}
       <ErrorModal isOpen={isErrorOpen} onClose={() => setIsErrorOpen(false)} />
     </>
   );

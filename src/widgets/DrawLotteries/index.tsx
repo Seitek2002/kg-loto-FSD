@@ -34,7 +34,7 @@ export const DrawLotteriesWidget = ({
   if (!isLoading && (!filteredLotteries || filteredLotteries.length === 0))
     return null;
 
-  console.log(lotteries);
+  // console.log(lotteries);
 
   return (
     <div className="my-12" id="draw-lotteries">

@@ -32,6 +32,7 @@ export const CartDrawer = () => {
   // Модалки
   const [isTopUpOpen, setIsTopUpOpen] = useState(false);
   const [isErrorOpen, setIsErrorOpen] = useState(false);
+  const [missingAmount, setMissingAmount] = useState<number>(0);
 
   if (items.length === 0) return null;
 
@@ -40,11 +41,10 @@ export const CartDrawer = () => {
   const totalPrice = items.reduce((sum, item) => sum + item.price, 0);
 
   const handleCheckout = () => {
-    // 1. Проверяем баланс перед запросом
     const currentBalance = Number(user?.balance || 0);
 
     if (currentBalance < totalPrice) {
-      // Денег не хватает -> открываем модалку пополнения
+      setMissingAmount(totalPrice - currentBalance);
       setIsTopUpOpen(true);
       return;
     }
@@ -149,7 +149,19 @@ export const CartDrawer = () => {
       </div>
 
       {/* Модалки рендерятся поверх всего */}
-      <TopUpModal isOpen={isTopUpOpen} onClose={() => setIsTopUpOpen(false)} />
+      <TopUpModal
+        isOpen={isTopUpOpen}
+        onClose={() => setIsTopUpOpen(false)}
+        initialAmount={missingAmount}
+        title="Выберите кошелек пополнения"
+        description={
+          <span className="text-[#EB5757] text-[13px] lg:text-[15px] block leading-relaxed">
+            Недостаточно средств на вашем балансе.
+            <br />
+            Необходимо пополнить: {missingAmount} сом
+          </span>
+        }
+      />
 
       <ErrorModal
         isOpen={isErrorOpen}
