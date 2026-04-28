@@ -284,7 +284,7 @@ export const CartClient = () => {
         </div>
 
         {/* МОБИЛЬНАЯ ПАНЕЛЬ ОПЛАТЫ */}
-        <div className="lg:hidden fixed bottom-22.5 left-4 right-4 bg-white rounded-3xl p-5 shadow-[0_-10px_40px_rgba(0,0,0,0.1)] z-40 border border-gray-100">
+        <div className="lg:hidden fixed bottom-0 left-4 right-4 bg-white rounded-3xl p-5 shadow-[0_-10px_40px_rgba(0,0,0,0.1)] z-100 border border-gray-100">
           <div className="flex items-center justify-between mb-4">
             <div className="flex flex-col">
               <span className="text-[13px] text-[#737373] font-medium mb-1">
