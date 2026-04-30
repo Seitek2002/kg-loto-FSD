@@ -37,7 +37,8 @@ export interface TransactionsResponse {
 export const financeApi = {
   // 1. Получение баланса
   getBalance: async () => {
-    const { data } = await api.get<BalanceResponse>("/profile/balance");
+    // 🔥 Добавлен слеш в конце
+    const { data } = await api.get<BalanceResponse>("/profile/balance/");
     return data.data;
   },
 
@@ -45,8 +46,9 @@ export const financeApi = {
   createPaylink: async (amount: string) => {
     const bodyString = `amount=${encodeURIComponent(amount)}`;
 
+    // 🔥 Добавлен слеш в конце
     const { data } = await api.post<PaylinkResponse>(
-      "/balance/paylink",
+      "/balance/paylink/",
       bodyString,
       {
         headers: {
@@ -91,7 +93,6 @@ export const useTopUp = () => {
   });
 };
 
-// 🔥 Изменили название хука на более правильное
 export const useTransactions = () => {
   return useQuery({
     queryKey: ["transactions"],

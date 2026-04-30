@@ -102,10 +102,11 @@ export interface RawDrawDto extends Omit<DrawDto, "title"> {
 export const ticketApi = {
   // Получение доступных билетов
   getTickets: async (params: FetchTicketsParams) => {
+    // 🔥 Добавлен слеш в конце
     const { data } = await api.get<{
       success: boolean;
       data: TicketsResponseData;
-    }>("/tickets", { params });
+    }>("/tickets/", { params });
     return data.data;
   },
 
@@ -116,7 +117,7 @@ export const ticketApi = {
   },
 
   getCurrentDraw: async (lotteryId: string) => {
-    // 🔥 Теперь всё строго типизировано, никаких any!
+    // 🔥 Добавлен слеш в конце и изменен ключ параметра на lottery_id
     const response = await api.get<{
       success: boolean;
       data: RawDrawDto[];
@@ -124,8 +125,8 @@ export const ticketApi = {
         drawCards?: DrawDto[];
         lotteryUi?: LotteryUiDto;
       };
-    }>("/draws/current", {
-      params: { lotteryId },
+    }>("/draws/current/", {
+      params: { lottery_id: lotteryId },
     });
 
     const drawCards = response.data?.meta?.drawCards || [];
