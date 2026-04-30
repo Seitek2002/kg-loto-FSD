@@ -29,12 +29,12 @@ export const DrawLotteriesWidget = ({
     currentLotteryId && lotteries
       ? lotteries.filter((loto) => String(loto.lotteryId) !== currentLotteryId)
       : lotteries;
+  console.log(lotteries);
 
   // Если загрузилось и пусто — ничего не рендерим, чтобы не ломать верстку
   if (!isLoading && (!filteredLotteries || filteredLotteries.length === 0))
     return null;
 
-  // console.log(lotteries);
 
   return (
     <div className="my-12" id="draw-lotteries">
