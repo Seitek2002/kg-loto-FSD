@@ -8,7 +8,7 @@ export const useHeroSlides = () => {
   return useQuery({
     queryKey: ["hero-slides"],
     queryFn: async () => {
-      const { data } = await api.get<{ data: SliderItem[] }>("/slider/");
+      const { data } = await api.get<{ data: SliderItem[] }>("/slider/?webview=true");
       return data.data || [];
     },
     // Кэшируем на 5 минут, как договаривались
