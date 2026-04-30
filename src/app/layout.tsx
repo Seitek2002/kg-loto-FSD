@@ -1,9 +1,13 @@
+import { Suspense } from "react";
+
 import type { Metadata, Viewport } from "next";
 import { Rubik } from "next/font/google";
 import localFont from "next/font/local";
 
 import { BottomNav } from "@/widgets/BottomNav/BottomNav";
 import { HeaderWidget } from "@/widgets/Header";
+
+import { AutoLoginHandler } from "@/features/auth/ui/AutoLoginHandler";
 
 import { LiquidFilterDef } from "@/shared/ui/LiquidFilterDef";
 
@@ -54,6 +58,11 @@ export default function RootLayout({
       <body
         className={`${rubik.variable} ${benzin.variable} antialiased font-rubik bg-[#F5F5F5]`}
       >
+        {/* 🔥 Добавляем обработчик логина на самый верх */}
+        <Suspense fallback={null}>
+          <AutoLoginHandler />
+        </Suspense>
+
         <QueryProvider>
           <LocaleProvider>
             <LiquidFilterDef />
