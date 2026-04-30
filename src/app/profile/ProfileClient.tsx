@@ -2,7 +2,6 @@
 
 import { useRef, useState } from "react";
 
-import Image from "next/image";
 import Link from "next/link";
 
 import { useMounted } from "@/hooks/useMounted";
@@ -31,22 +30,18 @@ export const ProfileClient = () => {
 
   if (!mounted) return null;
 
-  // 🔥 Безопасное отображение телефона (даже если он пришел как объект)
   const displayPhone = () => {
     if (!user?.phone) return user?.kglotteryProfile?.email || "";
 
-    // Если телефон — это объект { dialCode, number, ... }
     if (typeof user.phone === "object" && user.phone !== null) {
       const phoneObj = user.phone as any;
       return `${phoneObj.dialCode || ""} ${phoneObj.number || ""}`.trim();
     }
 
-    // Если телефон — обычная строка
     return String(user.phone);
   };
 
   const handleAvatarClick = () => {
-    // 🔥 Проверяем ОС прямо в момент клика. Не нужен стейт и useEffect!
     const userAgent = window.navigator.userAgent.toLowerCase();
     const isAppleDevice = /iphone|ipad|ipod|macintosh/.test(userAgent);
 
@@ -81,6 +76,9 @@ export const ProfileClient = () => {
     }
   };
 
+  // 🔥 Получаем первую букву имени для заглушки (или "И" если имени нет)
+  const initial = user?.name ? user.name.charAt(0).toUpperCase() : "И";
+
   return (
     <div className="flex flex-col items-center pt-8">
       <input
@@ -96,14 +94,11 @@ export const ProfileClient = () => {
           className="relative w-30 h-30 mb-4 cursor-pointer active:scale-95 transition-transform"
           onClick={handleAvatarClick}
         >
-          <div className="w-full h-full rounded-full overflow-hidden border-2 border-gray-200 bg-gray-200 relative">
-            <Image
-              src="/images/mock-avatar.jpg" // Убедись, что картинка есть в public/images/
-              alt="Аватар"
-              fill
-              unoptimized
-              className="object-cover"
-            />
+          {/* 🔥 Заглушка с инициалом */}
+          <div className="w-full h-full rounded-full overflow-hidden border-2 border-[#FF7600]/20 bg-[#F5F5F5] flex items-center justify-center relative shadow-sm">
+            <span className="text-4xl font-black text-[#4B4B4B] font-benzin">
+              {initial}
+            </span>
           </div>
 
           <div className="absolute bottom-0 right-2 w-8 h-8 bg-[#FF7600] rounded-full border-[3px] border-[#F5F5F5] flex items-center justify-center shadow-sm">

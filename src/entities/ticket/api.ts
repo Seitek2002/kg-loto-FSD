@@ -2,6 +2,14 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 
 import api from "@/shared/api/apiClient";
 
+export interface LotteryMetaDto {
+  backgroundImage?: string;
+  timerBackgroundImage?: string;
+  logo?: string;
+  lotteryLogo?: string;
+  drawCards?: DrawDto[];
+}
+
 export interface MyTicketDto {
   ticketId: string;
   lotteryId: string;
@@ -117,24 +125,25 @@ export const ticketApi = {
   },
 
   getCurrentDraw: async (lotteryId: string) => {
-    // 🔥 Добавлен слеш в конце и изменен ключ параметра на lottery_id
     const response = await api.get<{
       success: boolean;
       data: RawDrawDto[];
-      meta: {
-        drawCards?: DrawDto[];
-        lotteryUi?: LotteryUiDto;
-      };
+      meta: LotteryMetaDto; // Используем новый интерфейс
     }>("/draws/current/", {
       params: { lottery_id: lotteryId },
     });
 
-    const drawCards = response.data?.meta?.drawCards || [];
-
-    // Ищем открытый тираж среди карточек
+    const meta = response.data?.meta || {};
+    const drawCards = meta.drawCards || [];
     const openDraw = drawCards.find((draw) => draw.status === "open");
 
-    return openDraw || null;
+    if (!openDraw) return null;
+
+    // 🔥 Возвращаем сам тираж И прикрепляем к нему объект meta
+    return {
+      ...openDraw,
+      meta,
+    };
   },
 
   getMyTickets: async () => {

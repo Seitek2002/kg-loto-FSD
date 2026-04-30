@@ -76,7 +76,10 @@ export const TicketsHeroWidget = ({
       {/* ЛЕВАЯ КОЛОНКА: БОЛЬШОЙ БАННЕР */}
       <div className="lg:col-span-2 relative min-h-65 sm:min-h-87.5 lg:min-h-105 rounded-3xl lg:rounded-4xl overflow-hidden flex flex-col justify-between shadow-sm">
         <Image
-          src="/images/draw-tickets/big-block-bg.png"
+          src={
+            currentDraw?.meta?.backgroundImage ||
+            "/images/draw-tickets/big-block-bg.png"
+          }
           alt="Background"
           fill
           unoptimized
@@ -87,7 +90,11 @@ export const TicketsHeroWidget = ({
         <div className="relative z-10 flex flex-col items-left self-start pt-6 sm:pt-10 lg:pt-16 pl-4 sm:pl-8 lg:pl-16">
           <div className="relative w-25 h-18.75 sm:h-25 mb-2 sm:mb-4">
             <Image
-              src="/images/draw-tickets/super-jackpot-logo.png"
+              src={
+                currentDraw?.meta?.lotteryLogo ||
+                currentDraw?.meta?.logo ||
+                "/images/draw-tickets/super-jackpot-logo.png"
+              }
               alt="Супер Джекпот"
               fill
               unoptimized
@@ -185,7 +192,10 @@ export const TicketsHeroWidget = ({
         {/* БЛОК ТАЙМЕРА */}
         <div className="relative h-32.5 sm:h-37.5 lg:h-45 rounded-3xl lg:rounded-4xl overflow-hidden flex flex-col items-center justify-center shadow-sm">
           <Image
-            src="/images/draw-tickets/timer-block-bg.png"
+            src={
+              currentDraw?.meta?.timerBackgroundImage ||
+              "/images/draw-tickets/timer-block-bg.png"
+            }
             alt="Timer Background"
             fill
             unoptimized
