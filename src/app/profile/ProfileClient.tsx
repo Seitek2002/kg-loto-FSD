@@ -13,7 +13,6 @@ import { useAuthStore } from "@/shared/model/auth";
 
 const PROFILE_MENU = [
   { label: "Проверить билет", href: "/#check" },
-  { label: "Тиражные билеты", href: "/tickets" },
   { label: "Язык", href: "/language" },
   { label: "Победители", href: "/winners" },
   { label: "О компании", href: "/about" },
