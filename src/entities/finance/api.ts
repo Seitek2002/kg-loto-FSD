@@ -44,18 +44,14 @@ export const financeApi = {
 
   // 2. Создание ссылки на оплату
   createPaylink: async (amount: string) => {
-    const bodyString = `amount=${encodeURIComponent(amount)}`;
+    // 🔥 Формируем динамический URL для возврата пользователя
+    const redirectUrl = `${window.location.origin}/wallet`;
 
-    // 🔥 Добавлен слеш в конце
-    const { data } = await api.post<PaylinkResponse>(
-      "/balance/paylink/",
-      bodyString,
-      {
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-      },
-    );
+    // 🔥 Отправляем обычный JSON (Axios сам добавит Content-Type: application/json)
+    const { data } = await api.post<PaylinkResponse>("/balance/paylink/", {
+      amount: amount,
+      redirect_url: redirectUrl,
+    });
 
     return data.data;
   },
