@@ -95,7 +95,7 @@ export default function WalletPage() {
               </Button>
               <Button
                 variant="outline"
-                className="py-4 px-8 text-[14px] border-2 border-[#F58220] text-[#F58220] bg-transparent rounded-full hover:bg-orange-50"
+                className="py-4 hidden px-8 text-[14px] border-2 border-[#F58220] text-[#F58220] bg-transparent rounded-full hover:bg-orange-50"
               >
                 Вывести
               </Button>
