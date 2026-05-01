@@ -40,11 +40,13 @@ interface AuthState {
   refreshToken: string | null;
   isAuth: boolean;
   user: User | null;
+  appSource: string | null; // 🔥 Добавили поле для хранения источника приложения
 
   updateTokens: (newAccessToken: string, newRefreshToken?: string) => void;
   setTokens: (access: string, refresh: string) => void;
   setUser: (user: User) => void;
   updateUser: (updates: Partial<User>) => void;
+  setAppSource: (source: string | null) => void; // 🔥 Добавили метод сохранения
   logout: () => void;
 }
 
@@ -55,6 +57,7 @@ export const useAuthStore = create<AuthState>()(
       refreshToken: null,
       isAuth: false,
       user: null,
+      appSource: null, // 🔥 Начальное состояние
 
       updateTokens: (newAccessToken, newRefreshToken) =>
         set((state) => ({
@@ -74,12 +77,16 @@ export const useAuthStore = create<AuthState>()(
             : ({ ...updates } as User),
         })),
 
+      // 🔥 Реализация метода
+      setAppSource: (source) => set({ appSource: source }),
+
       logout: () =>
         set({
           accessToken: null,
           refreshToken: null,
           isAuth: false,
           user: null,
+          appSource: null, // 🔥 Очищаем источник при выходе
         }),
     }),
     {

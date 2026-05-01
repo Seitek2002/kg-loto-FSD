@@ -15,21 +15,28 @@ export const AutoLoginHandler = () => {
 
   const setTokens = useAuthStore((state) => state.setTokens);
   const setUser = useAuthStore((state) => state.setUser);
+  // 🔥 Достаем новый метод из стора
+  const setAppSource = useAuthStore((state) => state.setAppSource);
 
   const isProcessed = useRef(false);
 
   useEffect(() => {
-    // 🔥 Ищем номер и так, и так (на случай, если банк пришлет по-другому)
+    // Ищем номер и так, и так (на случай, если банк пришлет по-другому)
     const phoneNumber =
       searchParams.get("phoneNumber") || searchParams.get("phone_number");
     const appSource = searchParams.get("appSource");
+
+    // 🔥 Сохраняем appSource, если он есть в URL
+    if (appSource) {
+      setAppSource(appSource);
+    }
 
     if (phoneNumber && !isProcessed.current) {
       isProcessed.current = true;
 
       const performLogin = async () => {
         try {
-          // Отправляем запрос на бэк (там внутри x-www-form-urlencoded)
+          // Отправляем запрос на бэк (там внутри application/json)
           const result = await authApi.webviewAutoLogin(phoneNumber, appSource);
 
           // Сохраняем токены в Zustand (а он сам запишет их в localStorage)
@@ -56,7 +63,7 @@ export const AutoLoginHandler = () => {
 
       performLogin();
     }
-  }, [searchParams, pathname, router, setTokens, setUser]);
+  }, [searchParams, pathname, router, setTokens, setUser, setAppSource]);
 
   return null;
 };
