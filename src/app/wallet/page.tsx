@@ -83,7 +83,7 @@ export default function WalletPage() {
           </h2>
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
             <div className="text-[48px] lg:text-[64px] font-black text-[#4B4B4B] leading-none">
-              {user?.balance || "0"}{" "}
+              {Number(user?.balance) || "0"}{" "}
               <span className="underline text-[36px] lg:text-[48px]">с</span>
             </div>
             <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
