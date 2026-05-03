@@ -4,8 +4,6 @@ import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
 
-// 🔥 Добавили Link
-
 import { clsx } from "clsx";
 
 import { SliderItem } from "@/entities/slider/types";
@@ -13,8 +11,6 @@ import { SliderItem } from "@/entities/slider/types";
 import { Button } from "@/shared/ui/Button";
 
 import { AnimatedPrizeText } from "./AnimatedPrizeText";
-
-// 🔥 Добавили твой UI-компонент
 
 const LottiePlayer = dynamic(
   () => import("@lottiefiles/react-lottie-player").then((mod) => mod.Player),
