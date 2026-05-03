@@ -15,7 +15,7 @@ export const DrawLotteryCard = ({ lottery }: { lottery: CurrentLottery }) => {
 
   return (
     <Link
-      href={`/lottery/${lottery.lotteryId}`} // 🔥 Ведем на нашу детальную страницу
+      href={`/draw-tickets/${lottery.lotteryId}`} // 🔥 Ведем на нашу детальную страницу
       className="group relative w-full aspect-video sm:aspect-4/2.5 rounded-3xl overflow-hidden block active:scale-[0.98] transition-transform duration-200"
     >
       <Image
