@@ -11,7 +11,6 @@ import { useBalance } from "@/entities/finance/api";
 import { cn } from "@/shared/lib/utils";
 import { useAuthStore } from "@/shared/model/auth";
 
-// 🔥 Расширяем глобальный объект Window, чтобы TypeScript перестал ругаться
 declare global {
   interface Window {
     ReactNativeWebView?: {
