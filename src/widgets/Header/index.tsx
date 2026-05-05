@@ -13,7 +13,12 @@ import { useAuthStore } from "@/shared/model/auth";
 
 declare global {
   interface Window {
+    // Для React Native (оставим на всякий случай, если будут другие интеграции)
     ReactNativeWebView?: {
+      postMessage: (message: string) => void;
+    };
+    // 🔥 Добавляем канал для Flutter
+    FlutterChannel?: {
       postMessage: (message: string) => void;
     };
   }
@@ -33,9 +38,14 @@ export const HeaderWidget = ({ className }: { className?: string }) => {
       // 1. Попытка закрыть стандартным методом браузера
       window.close();
 
-      // 2. Теперь TypeScript знает про ReactNativeWebView и не будет выдавать ошибку
+      // 2. Попытка для React Native
       if (window.ReactNativeWebView) {
         window.ReactNativeWebView.postMessage("closeWebView");
+      }
+
+      // 3. 🔥 Попытка для Flutter
+      if (window.FlutterChannel) {
+        window.FlutterChannel.postMessage("closeWebView");
       }
     } else {
       router.back();
