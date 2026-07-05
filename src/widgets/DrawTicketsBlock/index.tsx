@@ -1,7 +1,11 @@
 "use client";
 
 import { useCartStore } from "@/entities/cart/model";
-import { useCurrentDraw, useTickets } from "@/entities/ticket/api";
+import {
+  isTicketAvailable,
+  useCurrentDraw,
+  useTickets,
+} from "@/entities/ticket/api";
 
 import { DrawTicketCard } from "@/shared/ui/DrawTicketCard";
 import { Skeleton } from "@/shared/ui/Skeleton";
@@ -27,9 +31,10 @@ export const DrawTicketsBlock = ({ lotteryId }: { lotteryId: string }) => {
 
   const isLoading = isDrawLoading || isTicketsLoading;
 
-  // Фильтруем только доступные билеты
+  // Статусы LTT произвольные (реальный статус доступного билета — "at_web_service"),
+  // поэтому фильтруем чёрным списком через isTicketAvailable
   const availableTickets =
-    ticketsData?.tickets?.filter((t) => t.status === "available") || [];
+    ticketsData?.tickets?.filter((t) => isTicketAvailable(t)) || [];
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
@@ -72,21 +77,21 @@ export const DrawTicketsBlock = ({ lotteryId }: { lotteryId: string }) => {
         </div>
       ) : (
         availableTickets.map((ticket) => {
+          // short_id используется как id билета в корзине (нужен для покупки)
+          const cartId = ticket.shortId || ticket.ticketId;
           // Ищем, есть ли билет в корзине
-          const isInBasket = basketIds.includes(ticket.ticketId);
-
-          // console.log(ticket);
+          const isInBasket = basketIds.includes(cartId);
 
           return (
             <DrawTicketCard
               key={ticket.ticketId}
               ticketNumber={ticket.ticketNumber}
               price={ticket.price}
-              selectedNumbers={ticket.combination}
+              selectedNumbers={ticket.combination ?? []}
               isInBasket={isInBasket}
               onToggle={() =>
                 toggleItem({
-                  id: ticket.ticketId,
+                  id: cartId,
                   price: ticket.price,
                   type: "other", // Логика super/other если понадобится
                   ticketNumber: ticket.ticketNumber,

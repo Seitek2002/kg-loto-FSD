@@ -13,12 +13,14 @@ export interface LotteryMetaDto {
 export interface MyTicketDto {
   ticketId: string;
   lotteryId: string;
-  drawId: string;
+  // drawId теперь число (ltt_id)
+  drawId: number;
   name: string;
   logo: string | null;
   purchaseDateDisplay: string;
   ticketNumber: string;
-  combination: number[];
+  // LTT-билеты не содержат пользовательской комбинации — поле опциональное
+  combination?: number[];
   price: string;
   currency: string;
   status: "sold" | "winning" | "losing";
@@ -29,7 +31,7 @@ export interface MyTicketDto {
 }
 
 export interface DrawDto {
-  drawId: string;
+  drawId: number;
   title: string;
   drawNumber: number;
   drawNumberDisplay: string;
@@ -37,10 +39,12 @@ export interface DrawDto {
   drawDateHuman: string;
   drawTime: string;
   drawTimeDisplay: string;
-  jackpotAmount: number;
-  jackpotAmountDisplay: string;
+  // jackpotAmount у LTT-тиражей больше нет — оставлено опциональным
+  jackpotAmount?: number;
+  jackpotAmountDisplay?: string;
   location: string;
-  status: "open" | "closed" | "completed";
+  // status — произвольная строка из LTT
+  status: string;
   salesStartAt: string;
   salesStartAtDisplay: string;
   salesEndAt: string;
@@ -48,6 +52,7 @@ export interface DrawDto {
 }
 
 // --- ИНТЕРФЕЙСЫ ДЛЯ ПОКУПКИ (POST) ---
+// Путь C (legacy, billing-mock): POST /me/balance/purchases/
 export interface PurchaseItem {
   lotteryId: string;
   drawId: string;
@@ -62,31 +67,82 @@ export interface PurchasePayload {
   items: PurchaseItem[];
 }
 
+// Путь B (актуальный): покупка реального LTT-билета за баланс.
+// POST /api/v1/me/balance/ltt-purchase/
+export interface LttPurchasePayload {
+  orderId: string; // уникальный ключ идемпотентности, генерируется на фронте
+  tickets: string[]; // short_id билетов из LttTicket
+  note?: string;
+}
+
+export interface LttPurchaseTicketResult {
+  shortId: string;
+  status: string;
+}
+
+export interface LttPurchaseResponse {
+  orderId: string;
+  status: "confirmed" | "rejected" | string;
+  purchaseId: number;
+  amount: string;
+  balance: string;
+  tickets: LttPurchaseTicketResult[];
+}
+
 // --- ИНТЕРФЕЙСЫ ДЛЯ ПОЛУЧЕНИЯ БИЛЕТОВ (GET) ---
 export interface FetchTicketsParams {
   lotteryId: string;
-  drawId: string;
+  drawId: number | string;
   page?: number;
   limit?: number;
 }
 
 export interface TicketDto {
   ticketId: string;
+  // short_id физического LTT-билета (нужен для покупки по пути B)
+  shortId?: string;
   ticketNumber: string;
-  combination: number[];
+  // LTT-билеты не содержат пользовательской комбинации — поле опциональное
+  combination?: number[];
   price: number;
   currency: string;
-  status: "available" | "sold" | "reserved" | "cancelled";
+  status: string; // "available" | "sold" | "reserved" | "cancelled" | иные строки LTT
 }
 
 export interface TicketsResponseData {
-  lottery_id: string;
-  draw_id: string;
+  lotteryId: string;
+  drawId: string | number;
+  name?: string | null;
   page: number;
   limit: number;
   total: number;
   tickets: TicketDto[];
 }
+
+// Ответ v2-эндпоинта /api/v2/lottery/tickets/ (работает напрямую с LttTicket)
+export interface LttTicketDto {
+  shortId: string;
+  ticketNumber?: string;
+  price?: number | string;
+  currency?: string;
+  status?: string;
+  wasSold?: boolean;
+}
+
+export interface FetchLttTicketsParams {
+  // TODO(backend): уточнить, что именно передавать в draw_code (код тиража LTT).
+  drawCode: string;
+  status?: string;
+  wasSold?: boolean;
+}
+
+// Статусы, при которых билет точно нельзя купить. Всё остальное
+// (включая "at_web_service" — реальный статус доступного LTT-билета)
+// считаем доступным: статусы у LTT произвольные, белый список ломается.
+const UNAVAILABLE_TICKET_STATUSES = ["sold", "reserved", "cancelled"];
+
+export const isTicketAvailable = (ticket: Pick<TicketDto, "status">) =>
+  !UNAVAILABLE_TICKET_STATUSES.includes(ticket.status);
 
 export interface LotteryRuleDto {
   id: number;
@@ -102,9 +158,14 @@ export interface LotteryUiDto {
 }
 
 export interface RawDrawDto extends Omit<DrawDto, "title"> {
-  winningCombination: number[] | null;
+  winningCombination?: number[] | null;
   currency: string;
 }
+
+// База для v2-эндпоинтов (apiClient настроен на /api/v1)
+const V2_BASE = (
+  process.env.NEXT_PUBLIC_API_URL || "https://kgloto.com/api/v1"
+).replace(/\/v1\/?$/, "/v2");
 
 // --- API ОБЪЕКТ ---
 export const ticketApi = {
@@ -118,10 +179,36 @@ export const ticketApi = {
     return data.data;
   },
 
-  // Покупка билетов с баланса
+  // Получение short_id доступных LTT-билетов (v2, напрямую из LttTicket)
+  getLttTickets: async (params: FetchLttTicketsParams) => {
+    const { data } = await api.get<{ data: LttTicketDto[] } | LttTicketDto[]>(
+      "/lottery/tickets/",
+      {
+        baseURL: V2_BASE,
+        params: {
+          drawCode: params.drawCode,
+          status: params.status,
+          wasSold: params.wasSold ?? false,
+        },
+      },
+    );
+    return Array.isArray(data) ? data : data.data;
+  },
+
+  // Путь C (legacy, billing-mock): покупка за баланс
   purchaseTickets: async (payload: PurchasePayload) => {
     const { data } = await api.post("/me/balance/purchases/", payload);
     return data;
+  },
+
+  // Путь B (актуальный): покупка реального LTT-билета за баланс
+  lttPurchase: async (payload: LttPurchasePayload) => {
+    const { data } = await api.post<
+      { data: LttPurchaseResponse } | LttPurchaseResponse
+    >("/me/balance/ltt-purchase/", payload);
+    return "data" in (data as any)
+      ? (data as any).data
+      : (data as LttPurchaseResponse);
   },
 
   getCurrentDraw: async (lotteryId: string) => {
@@ -135,7 +222,16 @@ export const ticketApi = {
 
     const meta = response.data?.meta || {};
     const drawCards = meta.drawCards || [];
-    const openDraw = drawCards.find((draw) => draw.status === "open");
+    // status у LTT-тиражей — произвольная строка (активный тираж на проде имеет
+    // статус "printing"), поэтому не полагаемся строго на "open": берём открытый
+    // по статусу, иначе тираж с ещё не завершёнными продажами, иначе первый.
+    const openDraw =
+      drawCards.find((draw) => draw.status === "open") ||
+      drawCards.find(
+        (draw) =>
+          !!draw.salesEndAt && new Date(draw.salesEndAt).getTime() > Date.now(),
+      ) ||
+      drawCards[0];
 
     if (!openDraw) return null;
 
@@ -169,6 +265,13 @@ export const useTickets = (
 export const usePurchaseTickets = () => {
   return useMutation({
     mutationFn: ticketApi.purchaseTickets,
+  });
+};
+
+// Путь B: покупка реального LTT-билета за баланс
+export const useLttPurchase = () => {
+  return useMutation({
+    mutationFn: ticketApi.lttPurchase,
   });
 };
 

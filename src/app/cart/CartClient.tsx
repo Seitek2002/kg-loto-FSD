@@ -14,9 +14,11 @@ import { type CartItem, useCartStore } from "@/entities/cart/model";
 import { useBalance } from "@/entities/finance/api";
 import {
   type TicketDto,
-  usePurchaseTickets,
+  isTicketAvailable,
+  useLttPurchase,
   useTickets,
 } from "@/entities/ticket/api";
+import { useAuthStore } from "@/shared/model/auth";
 
 import { cn } from "@/shared/lib/utils";
 import { Button } from "@/shared/ui/Button";
@@ -33,6 +35,10 @@ const getTicketPlural = (count: number) => {
   return "билетов";
 };
 
+// drawId теперь число (ltt_id); поддерживаем и старые строковые id вида "draw-...-NNN"
+const getDrawLabel = (drawId: number | string) =>
+  String(drawId).split("-").pop();
+
 // Реальный компонент для левой колонки (Быстрое добавление)
 const RealQuickAddTicket = ({
   ticket,
@@ -41,7 +47,7 @@ const RealQuickAddTicket = ({
 }: {
   ticket: TicketDto;
   lotteryId: string;
-  drawId: string;
+  drawId: number | string;
 }) => {
   const { toggleItem, items } = useCartStore();
   const numbers = Array.from({ length: 36 }, (_, i) => i + 1);
@@ -50,14 +56,14 @@ const RealQuickAddTicket = ({
 
   const handleAdd = () => {
     toggleItem({
-      id: ticket.ticketId,
+      id: ticket.shortId || ticket.ticketId,
       price: ticket.price,
       type: "other",
       ticketNumber: ticket.ticketNumber,
       combination: ticket.combination,
       lotteryId: lotteryId,
       drawId: drawId,
-      name: `Тираж №${drawId.split("-").pop()}`,
+      name: `Тираж №${getDrawLabel(drawId)}`,
     });
   };
 
@@ -77,7 +83,7 @@ const RealQuickAddTicket = ({
 
       <div className="grid grid-cols-6 gap-2 mb-6">
         {numbers.map((num) => {
-          const isSelected = ticket.combination.includes(num);
+          const isSelected = ticket.combination?.includes(num) ?? false;
           return (
             <div
               key={num}
@@ -114,11 +120,15 @@ export const CartClient = () => {
   const router = useRouter();
 
   // API Хуки
-  const { mutate: purchase, isPending: isPurchasing } = usePurchaseTickets();
+  const { mutate: purchase, isPending: isPurchasing } = useLttPurchase();
   const { refetch: refetchBalance } = useBalance();
+  const user = useAuthStore((state) => state.user);
 
   // Состояние ошибки
   const [isErrorOpen, setIsErrorOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string>(
+    "Возможно, на вашем балансе недостаточно средств или выбранные билеты уже выкуплены. Проверьте баланс и попробуйте снова.",
+  );
 
   // Получаем данные для боковой панели (ищем билеты из того же тиража)
   const firstItem = items[0];
@@ -132,7 +142,7 @@ export const CartClient = () => {
   );
 
   const availableTickets =
-    ticketsData?.tickets?.filter((t) => t.status === "available") || [];
+    ticketsData?.tickets?.filter((t) => isTicketAvailable(t)) || [];
   const quickAddTickets = availableTickets.slice(0, 2);
 
   // 🔥 Заменили any на CartItem
@@ -144,27 +154,60 @@ export const CartClient = () => {
   const handleCheckout = () => {
     if (items.length === 0) return;
 
+    // Для покупки LTT-билета за баланс бэку нужен год рождения (из профиля).
+    if (!user?.birthDate) {
+      setErrorMessage(
+        "Для покупки нужно указать дату рождения в профиле.",
+      );
+      setIsErrorOpen(true);
+      return;
+    }
+
+    // Путь B: покупка реального LTT-билета за баланс
     const payload = {
       orderId: `ORD-${Date.now()}`,
-      purchaseDatetime: new Date().toISOString(),
-      items: items.map((t) => ({
-        lotteryId: t.lotteryId,
-        drawId: t.drawId,
-        ticketId: t.id,
-        price: String(t.price),
-        currency: "KGS",
-      })),
+      tickets: items.map((t) => t.id), // short_id билетов
+      note: "",
     };
 
     purchase(payload, {
-      onSuccess: () => {
+      onSuccess: (res) => {
+        if (res?.status && res.status !== "confirmed") {
+          setErrorMessage(
+            "Покупка отклонена. Средства возвращены на баланс. Попробуйте ещё раз.",
+          );
+          setIsErrorOpen(true);
+          refetchBalance();
+          return;
+        }
         clearCart();
         refetchBalance();
         router.push("/tickets");
       },
       onError: (error) => {
         console.error("Ошибка покупки:", error);
+        const status = (error as { response?: { status?: number } })?.response
+          ?.status;
+
+        if (status === 402) {
+          setErrorMessage(
+            "Недостаточно средств на балансе. Пополните баланс и попробуйте снова.",
+          );
+        } else if (status === 400) {
+          setErrorMessage(
+            "Не удалось оформить покупку: билет уже продан или не заполнен профиль (дата рождения).",
+          );
+        } else if (status === 409) {
+          setErrorMessage(
+            "Заказ ещё обрабатывается. Подождите пару секунд и попробуйте снова.",
+          );
+        } else {
+          setErrorMessage(
+            "Возможно, выбранные билеты уже выкуплены. Попробуйте снова.",
+          );
+        }
         setIsErrorOpen(true);
+        refetchBalance();
       },
     });
   };
@@ -201,8 +244,8 @@ export const CartClient = () => {
               <RealQuickAddTicket
                 key={ticket.ticketId}
                 ticket={ticket}
-                lotteryId={ticketsData!.lottery_id}
-                drawId={ticketsData!.draw_id}
+                lotteryId={ticketsData!.lotteryId}
+                drawId={ticketsData!.drawId}
               />
             ))
           ) : (
@@ -235,7 +278,7 @@ export const CartClient = () => {
                     {item.name}
                   </h3>
                   <div className="flex flex-wrap gap-1 items-center">
-                    {item.combination.map((num, i) => (
+                    {item.combination?.map((num, i) => (
                       <NumberedBall key={i} number={num} size={28} />
                     ))}
                   </div>
@@ -315,7 +358,7 @@ export const CartClient = () => {
         isOpen={isErrorOpen}
         onClose={() => setIsErrorOpen(false)}
         title="Оплата не прошла"
-        message="Возможно, на вашем балансе недостаточно средств или выбранные билеты уже выкуплены. Проверьте баланс и попробуйте снова."
+        message={errorMessage}
       />
     </>
   );

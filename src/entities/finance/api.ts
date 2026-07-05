@@ -35,25 +35,47 @@ export interface TransactionsResponse {
 }
 
 export const financeApi = {
-  // 1. Получение баланса
+  // 1. Получение баланса — актуальный контракт: GET /api/v1/me/balance/.
+  // Пока он не задеплоен (404), откатываемся на старый /profile/balance/.
   getBalance: async () => {
-    // 🔥 Добавлен слеш в конце
-    const { data } = await api.get<BalanceResponse>("/profile/balance/");
-    return data.data;
+    try {
+      const { data } = await api.get<BalanceResponse>("/me/balance/");
+      return data.data;
+    } catch (error) {
+      if (
+        (error as { response?: { status?: number } })?.response?.status !== 404
+      )
+        throw error;
+      const { data } = await api.get<BalanceResponse>("/profile/balance/");
+      return data.data;
+    }
   },
 
-  // 2. Создание ссылки на оплату
+  // 2. Создание ссылки на оплату — POST /api/v1/me/balance/paylink/.
+  // Пока он не задеплоен (404), откатываемся на старый /balance/paylink/.
   createPaylink: async (amount: string) => {
     // 🔥 Формируем динамический URL для возврата пользователя
     const redirectUrl = `${window.location.origin}/wallet`;
+    // redirectUrl -> redirect_url через интерцептор
+    const body = { amount: amount, redirectUrl };
 
-    // 🔥 Отправляем обычный JSON (Axios сам добавит Content-Type: application/json)
-    const { data } = await api.post<PaylinkResponse>("/balance/paylink/", {
-      amount: amount,
-      redirect_url: redirectUrl,
-    });
-
-    return data.data;
+    try {
+      const { data } = await api.post<PaylinkResponse>(
+        "/me/balance/paylink/",
+        body,
+      );
+      return data.data;
+    } catch (error) {
+      if (
+        (error as { response?: { status?: number } })?.response?.status !== 404
+      )
+        throw error;
+      const { data } = await api.post<PaylinkResponse>(
+        "/balance/paylink/",
+        body,
+      );
+      return data.data;
+    }
   },
 
   // 3. История транзакций

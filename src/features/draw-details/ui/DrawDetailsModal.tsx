@@ -74,7 +74,8 @@ const MOCK_MODAL_DATA = {
 interface DrawDetailsModalProps {
   isOpen: boolean;
   onClose: () => void;
-  drawId: string | null;
+  // drawId теперь число (ltt_id); строка допускается для legacy-совместимости
+  drawId: number | string | null;
 }
 
 export const DrawDetailsModal = ({

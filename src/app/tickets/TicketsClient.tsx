@@ -64,8 +64,9 @@ export const TicketsClient = () => {
             if (ticket.status === "winning") uiStatus = "winning";
             if (ticket.status === "losing") uiStatus = "losing";
 
-            // Достаем номер тиража из drawId (например "001" из "draw-20260410-001")
-            const drawNumberStr = ticket.drawId?.split("-").pop() || "";
+            // drawId теперь число (ltt_id); поддерживаем и старые строковые id
+            const drawNumberStr =
+              String(ticket.drawId ?? "").split("-").pop() || "";
 
             return (
               <MyTicketCard

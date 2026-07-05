@@ -25,7 +25,7 @@ export const DrawArchiveBlock = ({ lotteryId }: DrawArchiveBlockProps) => {
   // Если нет — мы будем принудительно держать первый месяц открытым.
   const [hasInteracted, setHasInteracted] = useState(false);
 
-  const [selectedDrawId, setSelectedDrawId] = useState<string | null>(null);
+  const [selectedDrawId, setSelectedDrawId] = useState<number | null>(null);
 
   const { data: rawDraws, isLoading, isError } = useCurrentDraws(lotteryId);
 
@@ -35,8 +35,15 @@ export const DrawArchiveBlock = ({ lotteryId }: DrawArchiveBlockProps) => {
     const draws = (rawDraws as CurrentDraw[]) || [];
     if (draws.length === 0) return [];
 
+    // status у LTT-тиражей — произвольная строка ("finished", "printing", ...),
+    // причём активный (продающийся) тираж имеет статус "printing", а не "open".
+    // В архив относим только завершённые: по статусу либо по прошедшей дате продаж.
+    const FINISHED_STATUSES = ["finished", "completed", "closed", "cancelled"];
+    const now = Date.now();
     const completed = draws.filter(
-      (d) => d.status === "completed" || d.status === "closed",
+      (d) =>
+        FINISHED_STATUSES.includes(d.status) ||
+        (!!d.salesEndAt && new Date(d.salesEndAt).getTime() < now),
     );
 
     completed.sort(
@@ -172,7 +179,9 @@ export const DrawArchiveBlock = ({ lotteryId }: DrawArchiveBlockProps) => {
                                 {formattedDate}
                               </div>
                               <div className="text-[#4B4B4B] text-[15px]">
-                                {item.jackpotAmount.toLocaleString("ru-RU")} с
+                                {item.jackpotAmount?.toLocaleString("ru-RU") ??
+                                  "—"}{" "}
+                                с
                               </div>
                               <div className="flex gap-1.5 flex-wrap">
                                 {item.winningCombination ? (
@@ -215,7 +224,9 @@ export const DrawArchiveBlock = ({ lotteryId }: DrawArchiveBlockProps) => {
                                   Приз
                                 </span>
                                 <span className="text-[#4B4B4B] text-[14px] font-bold">
-                                  {item.jackpotAmount.toLocaleString("ru-RU")} с
+                                  {item.jackpotAmount?.toLocaleString("ru-RU") ??
+                                  "—"}{" "}
+                                с
                                 </span>
                               </div>
                               <div className="flex justify-between items-center">

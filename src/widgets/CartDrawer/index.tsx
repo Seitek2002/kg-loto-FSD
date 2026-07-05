@@ -8,7 +8,7 @@ import { TopUpModal } from "@/features/top-up/ui/TopUpModal";
 
 import { useCartStore } from "@/entities/cart/model";
 import { useBalance } from "@/entities/finance/api";
-import { usePurchaseTickets } from "@/entities/ticket/api";
+import { useLttPurchase } from "@/entities/ticket/api";
 
 import { cn } from "@/shared/lib/utils";
 import { useAuthStore } from "@/shared/model/auth";
@@ -26,12 +26,15 @@ export const CartDrawer = () => {
   const user = useAuthStore((state) => state.user);
 
   // API
-  const { mutate: purchase, isPending } = usePurchaseTickets();
+  const { mutate: purchase, isPending } = useLttPurchase();
   const { refetch: refetchBalance } = useBalance();
 
   // Модалки
   const [isTopUpOpen, setIsTopUpOpen] = useState(false);
   const [isErrorOpen, setIsErrorOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string>(
+    "Возможно, выбранные вами билеты уже были выкуплены другим участником. Пожалуйста, обновите список и попробуйте снова.",
+  );
   const [missingAmount, setMissingAmount] = useState<number>(0);
 
   if (items.length === 0) return null;
@@ -41,6 +44,14 @@ export const CartDrawer = () => {
   const totalPrice = items.reduce((sum, item) => sum + item.price, 0);
 
   const handleCheckout = () => {
+    // Для покупки LTT-билета за баланс бэку нужен год рождения (из профиля).
+    if (!user?.birthDate) {
+      setErrorMessage("Для покупки нужно указать дату рождения в профиле.");
+      setIsExpanded(false);
+      setIsErrorOpen(true);
+      return;
+    }
+
     const currentBalance = Number(user?.balance || 0);
 
     if (currentBalance < totalPrice) {
@@ -49,22 +60,24 @@ export const CartDrawer = () => {
       return;
     }
 
-    // 2. Денег хватает -> Формируем Payload
+    // 2. Денег хватает -> Путь B: покупка реального LTT-билета за баланс
     const payload = {
       orderId: `ORD-${Date.now()}`,
-      purchaseDatetime: new Date().toISOString(),
-      items: items.map((t) => ({
-        lotteryId: t.lotteryId,
-        drawId: t.drawId,
-        ticketId: t.id,
-        price: String(t.price),
-        currency: "KGS",
-      })),
+      tickets: items.map((t) => t.id), // short_id билетов
+      note: "",
     };
 
     // 3. Отправляем запрос на покупку
     purchase(payload, {
-      onSuccess: () => {
+      onSuccess: (res) => {
+        if (res?.status && res.status !== "confirmed") {
+          setErrorMessage(
+            "Покупка отклонена. Средства возвращены на баланс. Попробуйте ещё раз.",
+          );
+          setIsErrorOpen(true);
+          refetchBalance();
+          return;
+        }
         clearCart();
         refetchBalance();
         setIsExpanded(false);
@@ -73,7 +86,31 @@ export const CartDrawer = () => {
       },
       onError: (error) => {
         console.error("Ошибка при покупке:", error);
-        setIsErrorOpen(true); // Билет уже кто-то купил или сбой сервера
+        const status = (error as { response?: { status?: number } })?.response
+          ?.status;
+
+        if (status === 402) {
+          const bal = Number(user?.balance || 0);
+          setMissingAmount(Math.max(totalPrice - bal, 0));
+          setIsTopUpOpen(true);
+          refetchBalance();
+          return;
+        }
+
+        if (status === 400) {
+          setErrorMessage(
+            "Не удалось оформить покупку: билет уже продан или не заполнен профиль (дата рождения).",
+          );
+        } else if (status === 409) {
+          setErrorMessage(
+            "Заказ ещё обрабатывается. Подождите пару секунд и попробуйте снова.",
+          );
+        } else {
+          setErrorMessage(
+            "Возможно, выбранные билеты уже выкуплены. Попробуйте снова.",
+          );
+        }
+        setIsErrorOpen(true);
       },
     });
   };
@@ -167,7 +204,7 @@ export const CartDrawer = () => {
         isOpen={isErrorOpen}
         onClose={() => setIsErrorOpen(false)}
         title="Сбой при оплате"
-        message="Возможно, выбранные вами билеты уже были выкуплены другим участником. Пожалуйста, обновите список и попробуйте снова."
+        message={errorMessage}
       />
     </>
   );

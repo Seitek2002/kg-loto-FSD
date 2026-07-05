@@ -2,13 +2,15 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
 export interface CartItem {
-  id: string; // Это ticketId
+  id: string; // short_id LTT-билета (используется как ticket id для покупки)
   price: number;
   type: "super" | "other";
   ticketNumber: string;
-  combination: number[];
+  // LTT-билеты не содержат пользовательской комбинации — поле опциональное
+  combination?: number[];
   lotteryId: string;
-  drawId: string;
+  // drawId теперь число (ltt_id); строка допускается для legacy-совместимости
+  drawId: number | string;
   name: string;
 }
 
