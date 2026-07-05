@@ -2,6 +2,7 @@ import { CheckLotteryWidget } from "@/widgets/CheckLottery";
 import { DrawLotteriesWidget } from "@/widgets/DrawLotteries";
 import { FAQWidget } from "@/widgets/FAQ";
 import { HeroWidget } from "@/widgets/Hero";
+import { PopularTicketsWidget } from "@/widgets/PopularTickets";
 
 import api from "@/shared/api/apiClient";
 
@@ -44,7 +45,7 @@ export default async function Home() {
     <>
       <HeroWidget /> {/* slider */}
       <div className="mt-10 max-w-300 mx-auto px-4">
-        {/* <PopularTicketsWidget /> */}
+        <PopularTicketsWidget />
         <DrawLotteriesWidget /> {/* /lotteries/current */}
         <CheckLotteryWidget />
         <FAQWidget />
