@@ -15,6 +15,11 @@ import { cn } from "@/shared/lib/utils";
 import { useAuthStore } from "@/shared/model/auth";
 import { Button } from "@/shared/ui/Button";
 
+// Функционала вывода средств на сайте нет — если бэк вдруг пришлёт это слово
+// в свободном текстовом поле (статус, способ оплаты), на экране оно появиться не должно
+const containsWithdrawWord = (value: string) =>
+  /вывод|вывест|withdraw/i.test(value);
+
 // 🔥 Адаптировали статусы под ответ бэкенда ("Оплачено" и т.д.)
 const getStatusProps = (status: string) => {
   const s = status.toLowerCase();
@@ -27,7 +32,10 @@ const getStatusProps = (status: string) => {
   if (s.includes("отклонено") || s === "rejected") {
     return { text: status, classes: "bg-[#FFD7D7] text-[#FF4B4B]" };
   }
-  return { text: status, classes: "bg-[#FFF0D4] text-[#F58220]" };
+  return {
+    text: containsWithdrawWord(status) ? "Неизвестно" : status,
+    classes: "bg-[#FFF0D4] text-[#F58220]",
+  };
 };
 
 const getMethodName = (method: string) => {
@@ -38,7 +46,9 @@ const getMethodName = (method: string) => {
     elcart: "Элкарт",
     баланс: "С баланса",
   };
-  return knownMethods[method.toLowerCase()] || method;
+  const known = knownMethods[method.toLowerCase()];
+  if (known) return known;
+  return containsWithdrawWord(method) ? "Внутренний счет" : method;
 };
 
 const formatDate = (dateString: string) => {
@@ -92,12 +102,6 @@ export default function WalletPage() {
                 className="bg-[#F58220] hover:bg-[#E56A00] text-white py-4 px-8 text-[14px] rounded-full"
               >
                 Пополнить
-              </Button>
-              <Button
-                variant="outline"
-                className="py-4 hidden px-8 text-[14px] border-2 border-[#F58220] text-[#F58220] bg-transparent rounded-full hover:bg-orange-50"
-              >
-                Вывести
               </Button>
             </div>
           </div>

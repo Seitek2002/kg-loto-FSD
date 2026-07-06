@@ -10,10 +10,9 @@ interface BalanceResponse {
   };
 }
 
+// Ответ POST /balance/paylink/ приходит плоским объектом, без обёртки data
 interface PaylinkResponse {
-  data: {
-    paylinkUrl: string;
-  };
+  paylinkUrl: string;
 }
 
 // 🔥 ИНТЕРФЕЙСЫ ДЛЯ ТРАНЗАКЦИЙ
@@ -35,47 +34,24 @@ export interface TransactionsResponse {
 }
 
 export const financeApi = {
-  // 1. Получение баланса — актуальный контракт: GET /api/v1/me/balance/.
-  // Пока он не задеплоен (404), откатываемся на старый /profile/balance/.
+  // 1. Получение баланса — подтверждено бэком: актуальный путь — /profile/balance/
   getBalance: async () => {
-    try {
-      const { data } = await api.get<BalanceResponse>("/me/balance/");
-      return data.data;
-    } catch (error) {
-      if (
-        (error as { response?: { status?: number } })?.response?.status !== 404
-      )
-        throw error;
-      const { data } = await api.get<BalanceResponse>("/profile/balance/");
-      return data.data;
-    }
+    const { data } = await api.get<BalanceResponse>("/profile/balance/");
+    return data.data;
   },
 
-  // 2. Создание ссылки на оплату — POST /api/v1/me/balance/paylink/.
-  // Пока он не задеплоен (404), откатываемся на старый /balance/paylink/.
+  // 2. Создание ссылки на оплату — подтверждено бэком (июль 2026): эндпоинт
+  // снова включён на старом пути POST /balance/paylink/ (не /me/balance/paylink/),
+  // ответ приходит плоским объектом
   createPaylink: async (amount: string) => {
     // 🔥 Формируем динамический URL для возврата пользователя
     const redirectUrl = `${window.location.origin}/wallet`;
-    // redirectUrl -> redirect_url через интерцептор
-    const body = { amount: amount, redirectUrl };
 
-    try {
-      const { data } = await api.post<PaylinkResponse>(
-        "/me/balance/paylink/",
-        body,
-      );
-      return data.data;
-    } catch (error) {
-      if (
-        (error as { response?: { status?: number } })?.response?.status !== 404
-      )
-        throw error;
-      const { data } = await api.post<PaylinkResponse>(
-        "/balance/paylink/",
-        body,
-      );
-      return data.data;
-    }
+    const { data } = await api.post<PaylinkResponse>("/balance/paylink/", {
+      amount: amount,
+      redirectUrl,
+    });
+    return data;
   },
 
   // 3. История транзакций

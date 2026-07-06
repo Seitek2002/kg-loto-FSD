@@ -2,8 +2,6 @@
 
 import { ReactNode, useEffect, useState } from "react";
 
-import Image from "next/image";
-
 import { useMounted } from "@/hooks/useMounted";
 import { AnimatePresence, motion } from "framer-motion";
 import { X } from "lucide-react";
@@ -144,22 +142,21 @@ export const TopUpModal = ({
                 />
               </div>
 
+              {/* Блок "Доступные способы" временно скрыт.
               <div className="flex flex-col gap-3 mb-6">
-                {/* 🔥 Условный рендеринг: один банк или дефолтный список */}
                 {singleBankInfo ? (
-                  // <div className="bg-white rounded-[20px] p-5 border border-gray-100 shadow-sm flex items-center justify-center gap-4">
-                  //   <Image
-                  //     src={`/banks-logo/${singleBankInfo.file}.png`}
-                  //     alt={singleBankInfo.name}
-                  //     width={40}
-                  //     height={40}
-                  //     unoptimized
-                  //   />
-                  //   <span className="text-[18px] font-black text-[#4B4B4B]">
-                  //     {singleBankInfo.name}
-                  //   </span>
-                  // </div>
-                  <div></div>
+                  <div className="bg-white rounded-[20px] p-5 border border-gray-100 shadow-sm flex items-center justify-center gap-4">
+                    <Image
+                      src={`/banks-logo/${singleBankInfo.file}.png`}
+                      alt={singleBankInfo.name}
+                      width={40}
+                      height={40}
+                      unoptimized
+                    />
+                    <span className="text-[18px] font-black text-[#4B4B4B]">
+                      {singleBankInfo.name}
+                    </span>
+                  </div>
                 ) : (
                   <div className="bg-white rounded-[20px] p-4 border border-gray-100 shadow-sm">
                     <div className="text-[12px] font-bold text-[#4B4B4B] mb-3 opacity-60 uppercase tracking-tight">
@@ -191,6 +188,7 @@ export const TopUpModal = ({
                   </div>
                 )}
               </div>
+              */}
 
               <Button
                 onClick={handleTopUp}
