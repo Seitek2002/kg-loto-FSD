@@ -2,6 +2,8 @@
 
 import Image from "next/image";
 
+import { Download } from "lucide-react";
+
 import { cn } from "@/shared/lib/utils";
 import { Button } from "@/shared/ui/Button";
 import { NumberedBall } from "@/shared/ui/NumberedBall";
@@ -19,6 +21,10 @@ export interface MyTicketCardProps {
   combination?: number[];
   onAction?: () => void;
   drawDateDisplay?: string;
+  // Скачивание PDF доступно только для реальных LTT-билетов, купленных за баланс
+  canDownload?: boolean;
+  isDownloading?: boolean;
+  onDownload?: () => void;
 }
 
 export const MyTicketCard = ({
@@ -33,7 +39,10 @@ export const MyTicketCard = ({
   drawNumber,
   combination,
   onAction,
-  drawDateDisplay
+  drawDateDisplay,
+  canDownload = false,
+  isDownloading = false,
+  onDownload,
 }: MyTicketCardProps) => {
   const cleanAmount = prizeAmount.replace(/\s/g, "");
   const isNumeric = !isNaN(Number(cleanAmount)) && cleanAmount !== "";
@@ -139,6 +148,18 @@ export const MyTicketCard = ({
         >
           {status === "unchecked" ? "ПРОВЕРИТЬ" : "ПОЛУЧИТЬ"}
         </Button>
+      )}
+
+      {/* КНОПКА СКАЧАТЬ БИЛЕТ (PDF) */}
+      {canDownload && (
+        <button
+          onClick={onDownload}
+          disabled={isDownloading}
+          className="w-full mt-2 flex items-center justify-center gap-2 border border-[#EAEAEA] text-[#4B4B4B] py-3 rounded-2xl text-[13px] font-bold active:scale-[0.98] transition-all disabled:opacity-50"
+        >
+          <Download size={16} />
+          {isDownloading ? "Скачивание..." : "Скачать билет"}
+        </button>
       )}
     </div>
   );

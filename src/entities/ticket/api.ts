@@ -28,6 +28,14 @@ export interface MyTicketDto {
   prizeAmount?: number | string;
   drawDate?: string;
   drawDateDisplay?: string;
+  // Поля для печати/оформления билета (реальные LTT-билеты, купленные за баланс).
+  // Для билетов через мок-биллинг combinations = [combination], barcodeValue/serial — пустые строки.
+  combinations?: number[][];
+  gridCount?: number | null;
+  barcodeValue?: string;
+  serial?: string;
+  drawCode?: string;
+  drawName?: string;
 }
 
 export interface DrawDto {
@@ -101,6 +109,8 @@ export interface TicketDto {
   ticketId: string;
   // short_id физического LTT-билета (нужен для покупки по пути B)
   shortId?: string;
+  // Название лотереи — теперь дублируется в каждом билете (раньше было только на верхнем уровне ответа)
+  name?: string;
   ticketNumber: string;
   // LTT-билеты не содержат пользовательской комбинации — поле опциональное
   combination?: number[];
@@ -139,6 +149,8 @@ export interface FetchLttTicketsParams {
 // Статусы, при которых билет точно нельзя купить. Всё остальное
 // (включая "at_web_service" — реальный статус доступного LTT-билета)
 // считаем доступным: статусы у LTT произвольные, белый список ломается.
+// Бэк с 07.07.2026 сам не отдаёт проданные билеты в GET /tickets/ по умолчанию —
+// этот фильтр остаётся как подстраховка на случай явного ?status=... на бэке.
 const UNAVAILABLE_TICKET_STATUSES = ["sold", "reserved", "cancelled"];
 
 export const isTicketAvailable = (ticket: Pick<TicketDto, "status">) =>
@@ -266,6 +278,27 @@ export const ticketApi = {
     );
     return data.data;
   },
+
+  // Скачивание PDF купленного за баланс LTT-билета (лицевая + оборотная сторона)
+  downloadTicketPdf: async (ticketId: string): Promise<Blob> => {
+    const { data } = await api.get<Blob>(
+      `/me/balance/tickets/${ticketId}/pdf/`,
+      { responseType: "blob" },
+    );
+    return data;
+  },
+};
+
+// Инициирует скачивание Blob-файла браузером под заданным именем
+const downloadBlob = (blob: Blob, filename: string) => {
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
 };
 
 // --- ХУКИ ---
@@ -310,5 +343,14 @@ export const useMyTickets = () => {
   return useQuery({
     queryKey: ["myTickets"],
     queryFn: ticketApi.getMyTickets,
+  });
+};
+
+export const useDownloadTicketPdf = () => {
+  return useMutation({
+    mutationFn: async (ticketId: string) => {
+      const blob = await ticketApi.downloadTicketPdf(ticketId);
+      downloadBlob(blob, `kgloto_ticket_${ticketId}.pdf`);
+    },
   });
 };

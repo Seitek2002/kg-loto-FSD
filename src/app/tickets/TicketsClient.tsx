@@ -4,17 +4,28 @@ import { useMemo, useState } from "react";
 
 import { Loader2 } from "lucide-react";
 
-import { useMyTickets } from "@/entities/ticket/api";
+import { useDownloadTicketPdf, useMyTickets } from "@/entities/ticket/api";
 import { MyTicketCard } from "@/entities/ticket/ui/MyTicketCard";
 
 import { cn } from "@/shared/lib/utils";
 import { Button } from "@/shared/ui/Button";
+import { ErrorModal } from "@/shared/ui/ErrorModal";
 
 const TABS = ["Все билеты", "Выигрышные", "Не проверены"];
 
 export const TicketsClient = () => {
   const [activeTab, setActiveTab] = useState(TABS[0]);
   const { data: tickets = [], isLoading } = useMyTickets();
+  const [isErrorOpen, setIsErrorOpen] = useState(false);
+  const {
+    mutate: downloadPdf,
+    isPending: isDownloading,
+    variables: downloadingTicketId,
+  } = useDownloadTicketPdf();
+
+  const handleDownload = (ticketId: string) => {
+    downloadPdf(ticketId, { onError: () => setIsErrorOpen(true) });
+  };
 
   // Фильтрация
   const filteredTickets = useMemo(() => {
@@ -85,6 +96,11 @@ export const TicketsClient = () => {
                 drawNumber={drawNumberStr}
                 combination={ticket.combination}
                 drawDateDisplay={ticket.drawDateDisplay}
+                canDownload={!!ticket.barcodeValue}
+                isDownloading={
+                  isDownloading && downloadingTicketId === ticket.ticketId
+                }
+                onDownload={() => handleDownload(ticket.ticketId)}
               />
             );
           })}
@@ -107,6 +123,13 @@ export const TicketsClient = () => {
           </Button>
         </div>
       )}
+
+      <ErrorModal
+        isOpen={isErrorOpen}
+        onClose={() => setIsErrorOpen(false)}
+        title="Не удалось скачать билет"
+        message="Билет не найден или ещё не оплачен. Попробуйте позже."
+      />
     </div>
   );
 };
