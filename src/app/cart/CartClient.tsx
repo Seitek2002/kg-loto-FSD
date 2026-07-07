@@ -176,9 +176,13 @@ export const CartClient = () => {
           refetchBalance();
           return;
         }
+        const ticketCount = res?.tickets?.length || items.length;
+
         clearCart();
         refetchBalance();
-        showToast("Билет успешно куплен!");
+        showToast(
+          `Куплено ${ticketCount} ${getTicketPlural(ticketCount)}! Списано ${res?.amount ?? totalPrice} с`,
+        );
         // Купленные билеты не должны продолжать висеть в сетке как доступные
         queryClient.invalidateQueries({ queryKey: ["tickets"] });
         router.push("/tickets");

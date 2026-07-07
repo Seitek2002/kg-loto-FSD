@@ -20,6 +20,15 @@ import { useToastStore } from "@/shared/ui/Toast/toastStore";
 
 // Проверь путь к модалке пополнения
 
+const getTicketPlural = (count: number) => {
+  const lastTwo = count % 100;
+  const lastDigit = count % 10;
+  if (lastTwo >= 11 && lastTwo <= 19) return "билетов";
+  if (lastDigit === 1) return "билет";
+  if (lastDigit >= 2 && lastDigit <= 4) return "билета";
+  return "билетов";
+};
+
 export const CartDrawer = () => {
   const [isExpanded, setIsExpanded] = useState(false);
   const router = useRouter();
@@ -75,10 +84,14 @@ export const CartDrawer = () => {
           refetchBalance();
           return;
         }
+        const ticketCount = res?.tickets?.length || items.length;
+
         clearCart();
         refetchBalance();
         setIsExpanded(false);
-        showToast("Билет успешно куплен!");
+        showToast(
+          `Куплено ${ticketCount} ${getTicketPlural(ticketCount)}! Списано ${res?.amount ?? totalPrice} с`,
+        );
         // Купленные билеты не должны продолжать висеть в сетке как доступные
         queryClient.invalidateQueries({ queryKey: ["tickets"] });
         router.push("/tickets");
