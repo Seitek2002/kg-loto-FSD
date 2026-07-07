@@ -25,7 +25,10 @@ export const useLotteries = () => {
     queryKey: ["lotteries"],
     queryFn: async () => {
       const { data } = await api.get<{ data: LotteryItem[] }>("/lotteries/");
-      return data.data || [];
+      const lotteries = data.data || [];
+      // /lotteries/ отдаёт и моментальные, и тиражные лотереи вперемешку —
+      // этот список используется только для моментальных (PopularTickets)
+      return lotteries.filter((lottery) => lottery.lotteryType !== "draw");
     },
     staleTime: 1000 * 60 * 5,
   });

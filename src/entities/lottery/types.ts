@@ -13,6 +13,7 @@ export interface LotteryItem {
   buttonPrice: number | null;
   buttonLabel: string;
   buttonUrl?: string;
+  lotteryType?: "instant" | "draw";
   drawTime: string;
   theme: 'white' | 'dark';
   backgroundImage: string;
