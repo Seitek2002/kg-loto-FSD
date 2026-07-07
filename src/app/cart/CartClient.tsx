@@ -157,15 +157,6 @@ export const CartClient = () => {
   const handleCheckout = () => {
     if (items.length === 0) return;
 
-    // Для покупки LTT-билета за баланс бэку нужен год рождения (из профиля).
-    if (!user?.birthDate) {
-      setErrorMessage(
-        "Для покупки нужно указать дату рождения в профиле.",
-      );
-      setIsErrorOpen(true);
-      return;
-    }
-
     // Путь B: покупка реального LTT-билета за баланс
     const payload = {
       orderId: `ORD-${Date.now()}`,

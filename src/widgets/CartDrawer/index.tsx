@@ -47,14 +47,6 @@ export const CartDrawer = () => {
   const totalPrice = items.reduce((sum, item) => sum + item.price, 0);
 
   const handleCheckout = () => {
-    // Для покупки LTT-билета за баланс бэку нужен год рождения (из профиля).
-    if (!user?.birthDate) {
-      setErrorMessage("Для покупки нужно указать дату рождения в профиле.");
-      setIsExpanded(false);
-      setIsErrorOpen(true);
-      return;
-    }
-
     const currentBalance = Number(user?.balance || 0);
 
     if (currentBalance < totalPrice) {
