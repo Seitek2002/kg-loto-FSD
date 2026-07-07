@@ -26,6 +26,7 @@ import { cn } from "@/shared/lib/utils";
 import { Button } from "@/shared/ui/Button";
 import { ErrorModal } from "@/shared/ui/ErrorModal";
 import { NumberedBall } from "@/shared/ui/NumberedBall";
+import { useToastStore } from "@/shared/ui/Toast/toastStore";
 
 // Вспомогательная функция для склонения
 const getTicketPlural = (count: number) => {
@@ -126,6 +127,7 @@ export const CartClient = () => {
   const { refetch: refetchBalance } = useBalance();
   const user = useAuthStore((state) => state.user);
   const queryClient = useQueryClient();
+  const showToast = useToastStore((s) => s.showToast);
 
   // Состояние ошибки
   const [isErrorOpen, setIsErrorOpen] = useState(false);
@@ -176,6 +178,7 @@ export const CartClient = () => {
         }
         clearCart();
         refetchBalance();
+        showToast("Билет успешно куплен!");
         // Купленные билеты не должны продолжать висеть в сетке как доступные
         queryClient.invalidateQueries({ queryKey: ["tickets"] });
         router.push("/tickets");

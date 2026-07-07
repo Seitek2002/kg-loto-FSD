@@ -10,6 +10,7 @@ import { HeaderWidget } from "@/widgets/Header";
 import { AutoLoginHandler } from "@/features/auth/ui/AutoLoginHandler";
 
 import { LiquidFilterDef } from "@/shared/ui/LiquidFilterDef";
+import { ToastContainer } from "@/shared/ui/Toast";
 
 import { LocaleProvider } from "./LocaleProvider";
 import "./globals.css";
@@ -65,6 +66,7 @@ export default function RootLayout({
 
         <QueryProvider>
           <LocaleProvider>
+            <ToastContainer />
             <LiquidFilterDef />
 
             <div className="relative flex flex-col h-dvh overflow-hidden">
