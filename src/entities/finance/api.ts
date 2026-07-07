@@ -10,9 +10,9 @@ interface BalanceResponse {
   };
 }
 
-// Ответ POST /balance/paylink/ приходит плоским объектом, без обёртки data
+// Реальный ответ POST /balance/paylink/ обёрнут: { data: { paylinkUrl }, meta: {} }
 interface PaylinkResponse {
-  paylinkUrl: string;
+  data: { paylinkUrl: string };
 }
 
 // 🔥 ИНТЕРФЕЙСЫ ДЛЯ ТРАНЗАКЦИЙ
@@ -42,7 +42,7 @@ export const financeApi = {
 
   // 2. Создание ссылки на оплату — подтверждено бэком (июль 2026): эндпоинт
   // снова включён на старом пути POST /balance/paylink/ (не /me/balance/paylink/),
-  // ответ приходит плоским объектом
+  // ответ обёрнут в data
   createPaylink: async (amount: string) => {
     // 🔥 Формируем динамический URL для возврата пользователя
     const redirectUrl = `${window.location.origin}/wallet`;
@@ -51,7 +51,7 @@ export const financeApi = {
       amount: amount,
       redirectUrl,
     });
-    return data;
+    return data.data;
   },
 
   // 3. История транзакций

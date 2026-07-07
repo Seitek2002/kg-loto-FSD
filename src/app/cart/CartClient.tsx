@@ -7,6 +7,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import { useMounted } from "@/hooks/useMounted";
+import { useQueryClient } from "@tanstack/react-query";
 import { Loader2, Plus, Trash2 } from "lucide-react";
 
 // 🔥 Добавили импорт типа CartItem
@@ -14,6 +15,7 @@ import { type CartItem, useCartStore } from "@/entities/cart/model";
 import { useBalance } from "@/entities/finance/api";
 import {
   type TicketDto,
+  getSoldTicketErrorMessage,
   isTicketAvailable,
   useLttPurchase,
   useTickets,
@@ -123,6 +125,7 @@ export const CartClient = () => {
   const { mutate: purchase, isPending: isPurchasing } = useLttPurchase();
   const { refetch: refetchBalance } = useBalance();
   const user = useAuthStore((state) => state.user);
+  const queryClient = useQueryClient();
 
   // Состояние ошибки
   const [isErrorOpen, setIsErrorOpen] = useState(false);
@@ -182,6 +185,8 @@ export const CartClient = () => {
         }
         clearCart();
         refetchBalance();
+        // Купленные билеты не должны продолжать висеть в сетке как доступные
+        queryClient.invalidateQueries({ queryKey: ["tickets"] });
         router.push("/tickets");
       },
       onError: (error) => {
@@ -193,6 +198,10 @@ export const CartClient = () => {
           setErrorMessage(
             "Недостаточно средств на балансе. Пополните баланс и попробуйте снова.",
           );
+        } else if (getSoldTicketErrorMessage(error)) {
+          // Билет успели купить раньше нас — освежаем список, чтобы он пропал из сетки
+          setErrorMessage(getSoldTicketErrorMessage(error)!);
+          queryClient.invalidateQueries({ queryKey: ["tickets"] });
         } else if (status === 400) {
           setErrorMessage(
             "Не удалось оформить покупку: билет уже продан или не заполнен профиль (дата рождения).",

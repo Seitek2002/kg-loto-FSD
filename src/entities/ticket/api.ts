@@ -144,6 +144,24 @@ const UNAVAILABLE_TICKET_STATUSES = ["sold", "reserved", "cancelled"];
 export const isTicketAvailable = (ticket: Pick<TicketDto, "status">) =>
   !UNAVAILABLE_TICKET_STATUSES.includes(ticket.status);
 
+// При покупке уже проданного билета бэк отвечает 400 с телом вида
+// { tickets: ["Билет <ticketId> уже продан"] } — показывать пользователю
+// сырой текст с id билета нельзя, поэтому вырезаем понятную часть
+export const getSoldTicketErrorMessage = (error: unknown): string | null => {
+  const tickets = (
+    error as { response?: { data?: { tickets?: unknown } } }
+  )?.response?.data?.tickets;
+
+  if (
+    Array.isArray(tickets) &&
+    tickets.some((t) => typeof t === "string" && /продан/i.test(t))
+  ) {
+    return "Этот билет уже продан";
+  }
+
+  return null;
+};
+
 export interface LotteryRuleDto {
   id: number;
   image: string;
@@ -259,6 +277,11 @@ export const useTickets = (
     queryKey: ["tickets", params.lotteryId, params.drawId, params.page],
     queryFn: () => ticketApi.getTickets(params),
     enabled: enabled && !!params.lotteryId && !!params.drawId,
+    // Доступность билетов — быстро меняющиеся данные (несколько человек могут
+    // покупать одновременно), поэтому не полагаемся на общий 5-минутный кэш
+    // и запрет рефетча при маунте из глобального QueryClient
+    staleTime: 15 * 1000,
+    refetchOnMount: "always",
   });
 };
 

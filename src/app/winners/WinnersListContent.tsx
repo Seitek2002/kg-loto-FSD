@@ -7,7 +7,7 @@ import Link from "next/link";
 import { useMounted } from "@/hooks/useMounted";
 import { ChevronLeft } from "lucide-react";
 
-import { useWinners } from "@/entities/winner/api";
+import { useWinnerLotteries, useWinners } from "@/entities/winner/api";
 import { WinnerCard } from "@/entities/winner/ui/WinnerCard";
 
 import { cn } from "@/shared/lib/utils";
@@ -30,43 +30,37 @@ export interface WinnerItem {
 
 export const WinnersListContent = () => {
   const mounted = useMounted();
-  const { data: rawData, isLoading } = useWinners();
 
-  const [selectedFilters, setSelectedFilters] = useState<string[]>([]);
+  const [selectedFilters, setSelectedFilters] = useState<number[]>([]);
   const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
 
-  // 🔥 2. Оборачиваем в useMemo, чтобы ссылка на пустой массив не менялась при каждом рендере
+  // Реальный список лотерей, по которым есть отмеченные победители —
+  // источник фильтра, а не то, что случайно встретилось в данных победителей
+  const { data: lotteryOptions } = useWinnerLotteries();
+  const { data: rawData, isLoading } = useWinners(selectedFilters);
+
   const allWinners = useMemo<WinnerItem[]>(() => {
     return (rawData as WinnerItem[]) || [];
   }, [rawData]);
 
-  // ДИНАМИЧЕСКИЕ ФИЛЬТРЫ
-  const dynamicFilters = useMemo(() => {
-    if (allWinners.length === 0) return [];
+  const dynamicFilters = useMemo(
+    () =>
+      (lotteryOptions || []).map((lottery) => ({
+        label: lottery.title,
+        value: lottery.id,
+      })),
+    [lotteryOptions],
+  );
 
-    const allBadges = allWinners.map((w) => w.lotteryBadge);
-    const uniqueBadges = Array.from(new Set(allBadges));
-
-    return uniqueBadges.map((badge) => ({
-      label: badge,
-      value: badge.toLowerCase(),
-    }));
-  }, [allWinners]);
-
-  const filteredWinners = useMemo(() => {
-    if (allWinners.length === 0) return [];
-    if (selectedFilters.length === 0) return allWinners;
-
-    return allWinners.filter((w) =>
-      selectedFilters.includes(w.lotteryBadge.toLowerCase()),
-    );
-  }, [selectedFilters, allWinners]);
+  // Фильтрация теперь на бэке (?lotteryId=/&lotteryIds=), поэтому allWinners
+  // уже соответствует выбранным фильтрам
+  const filteredWinners = allWinners;
 
   const visibleWinners = filteredWinners.slice(0, visibleCount);
   const hasMore = visibleCount < filteredWinners.length;
   const isAllSelected = selectedFilters.length === 0;
 
-  const toggleFilter = (value: string) => {
+  const toggleFilter = (value: number) => {
     setSelectedFilters((prev) =>
       prev.includes(value)
         ? prev.filter((item) => item !== value)
@@ -123,12 +117,12 @@ export const WinnersListContent = () => {
               Все
             </button>
 
-            {dynamicFilters.map((option, i) => {
+            {dynamicFilters.map((option) => {
               const isActive = selectedFilters.includes(option.value);
 
               return (
                 <button
-                  key={i}
+                  key={option.value}
                   onClick={() => toggleFilter(option.value)}
                   className={cn(
                     "px-5 py-2.5 rounded-full text-xs font-bold font-benzin uppercase transition-all active:scale-95 border",

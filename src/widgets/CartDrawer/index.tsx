@@ -4,11 +4,13 @@ import { useState } from "react";
 
 import { useRouter } from "next/navigation";
 
+import { useQueryClient } from "@tanstack/react-query";
+
 import { TopUpModal } from "@/features/top-up/ui/TopUpModal";
 
 import { useCartStore } from "@/entities/cart/model";
 import { useBalance } from "@/entities/finance/api";
-import { useLttPurchase } from "@/entities/ticket/api";
+import { getSoldTicketErrorMessage, useLttPurchase } from "@/entities/ticket/api";
 
 import { cn } from "@/shared/lib/utils";
 import { useAuthStore } from "@/shared/model/auth";
@@ -28,6 +30,7 @@ export const CartDrawer = () => {
   // API
   const { mutate: purchase, isPending } = useLttPurchase();
   const { refetch: refetchBalance } = useBalance();
+  const queryClient = useQueryClient();
 
   // Модалки
   const [isTopUpOpen, setIsTopUpOpen] = useState(false);
@@ -81,6 +84,8 @@ export const CartDrawer = () => {
         clearCart();
         refetchBalance();
         setIsExpanded(false);
+        // Купленные билеты не должны продолжать висеть в сетке как доступные
+        queryClient.invalidateQueries({ queryKey: ["tickets"] });
         alert("Билеты успешно приобретены!"); // Позже заменим на красивый SuccessModal
         router.push("/tickets");
       },
@@ -94,6 +99,15 @@ export const CartDrawer = () => {
           setMissingAmount(Math.max(totalPrice - bal, 0));
           setIsTopUpOpen(true);
           refetchBalance();
+          return;
+        }
+
+        const soldMessage = getSoldTicketErrorMessage(error);
+        if (soldMessage) {
+          // Билет успели купить раньше нас — освежаем список, чтобы он пропал из сетки
+          setErrorMessage(soldMessage);
+          setIsErrorOpen(true);
+          queryClient.invalidateQueries({ queryKey: ["tickets"] });
           return;
         }
 

@@ -16,3 +16,11 @@ export interface PaginatedResult<T> {
   previous: string | null;
   results: T[];
 }
+
+// GET /api/v1/winners/lotteries/ — лотереи, по которым есть отмеченные
+// победители; используется для построения фильтра на экране /winners
+export interface WinnerLotteryOption {
+  id: number;
+  title: string;
+  billingLotteryId: string | null;
+}
